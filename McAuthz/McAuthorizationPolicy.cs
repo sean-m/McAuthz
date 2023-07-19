@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using McAuthz.Policy;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace McAuthz {
+namespace McAuthz
+{
 
     public class RequireMcRuleApprovedHandler : AuthorizationHandler<RequireMcRuleApproved> {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RequireMcRuleApproved requirement) {
