@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace McAuthz.Policy {
-    public interface IRulePolicy : IExpressionRule {
+    public interface RulePolicy : IExpressionRule {
         new string TargetType { get; set; }
         string Route { get; set; }
         bool EvaluateRules(object inputs);

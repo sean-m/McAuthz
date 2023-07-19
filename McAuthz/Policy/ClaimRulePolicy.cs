@@ -9,7 +9,7 @@ using System.Text;
 
 namespace McAuthz.Policy
 {
-    public class ClaimRulePolicy : IRulePolicy {
+    public class ClaimRulePolicy : RulePolicy {
 
         #region properties
         public string TargetType { get => "Claim"; set => _ = value; }

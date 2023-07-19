@@ -8,9 +8,9 @@ using System.Text;
 
 namespace McAuthz {
     public class RequireMcRuleApproved : IAuthorizationRequirement {
-        private Func<string, IEnumerable<IRulePolicy>> _rules;
+        private Func<string, IEnumerable<RulePolicy>> _rules;
 
-        public RequireMcRuleApproved(Func<string, IEnumerable<IRulePolicy>> rules) {
+        public RequireMcRuleApproved(Func<string, IEnumerable<RulePolicy>> rules) {
             _rules = rules;
         }
 

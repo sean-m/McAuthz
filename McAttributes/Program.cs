@@ -163,14 +163,14 @@ app.Run();
 
 
 public class RuleProvider {
-    public List<IRulePolicy> rules = new List<IRulePolicy> {
+    public List<RulePolicy> rules = new List<RulePolicy> {
         new ClaimRulePolicy(
             new[] { ("name", "Sean McArdle") }) {
             Route = "/api/User"
         }
     };
 
-    public IEnumerable<IRulePolicy> Rules(string route) {
+    public IEnumerable<RulePolicy> Rules(string route) {
         System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules() : Rule set fetched.");
         return rules.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
     }
