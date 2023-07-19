@@ -1,4 +1,4 @@
-﻿using McAuthz.Policy;
+﻿using McAuthz.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -6,10 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace McAuthz {
+namespace McAuthz
+{
     public class RequireMcRuleApproved : IAuthorizationRequirement {
         private Func<string, IEnumerable<RulePolicy>> _rules;
 
+        /// <summary>
+        /// This is the requirement that associates McRule policies with a given
+        /// controller. The requirement handler invokes methods on this requirement
+        /// as needed. 
+        /// In order to facilitate hot-loaded rules, the constructor takes
+        /// a Func which is called to fetch the rule set on each evaulation. Caching
+        /// and optimization can happen upstream but if this is what's slowing your
+        /// app down, what in the world are you doing with these rules?
+        /// </summary>
+        /// <param name="rules"></param>
         public RequireMcRuleApproved(Func<string, IEnumerable<RulePolicy>> rules) {
             _rules = rules;
         }

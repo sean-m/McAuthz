@@ -1,4 +1,5 @@
-﻿using McRule;
+﻿using McAuthz.Interfaces;
+using McRule;
 using System;
 using System.Collections.Generic;
 using System.Data;
