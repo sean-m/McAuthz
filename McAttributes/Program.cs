@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authorization;
 using McAuthz;
+using McAuthz.Policy;
 
 static IEdmModel GetEdmModel() {
     var edmBuilder = new ODataConventionModelBuilder();
@@ -162,14 +163,14 @@ app.Run();
 
 
 public class RuleProvider {
-    public List<ClaimRulePolicy> rules = new List<ClaimRulePolicy> {
+    public List<IRulePolicy> rules = new List<IRulePolicy> {
         new ClaimRulePolicy(
             new[] { ("name", "Sean McArdle") }) {
             Route = "/api/User"
         }
     };
 
-    public IEnumerable<ClaimRulePolicy> Rules(string route) {
+    public IEnumerable<IRulePolicy> Rules(string route) {
         System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules() : Rule set fetched.");
         return rules.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
     }
