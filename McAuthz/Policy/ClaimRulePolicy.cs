@@ -10,15 +10,12 @@ using System.Text;
 
 namespace McAuthz.Policy
 {
-    public class ClaimRulePolicy : RulePolicy {
+    public class ClaimRulePolicy : RulePolicyBase, RulePolicy {
 
         #region properties
         public string TargetType { get => "Claim"; set => _ = value; }
 
         public string Route { get; set; } = "*";
-
-
-        List<IExpressionRule> policyRules = new List<IExpressionRule>();
 
         #endregion  // properties
 
@@ -59,7 +56,7 @@ namespace McAuthz.Policy
         {
             if (_rule == null)
             {
-                var ruleExpression = PredicateExpressionPolicyExtensions.CombineAnd(policyRules.Select(x => x.GetExpression<Claim>()));
+                var ruleExpression = GetExpression<Claim>();
                 _ruleString = ruleExpression?.ToString();
                 _rule = ruleExpression?.Compile();
             }
@@ -73,11 +70,7 @@ namespace McAuthz.Policy
         }
 
 
-        #region IRulePolicy_IExpressionRule
-
-        public Expression<Func<T, bool>>? GetExpression<T>() {
-            return PredicateExpressionPolicyExtensions.CombineAnd(policyRules.Select(x => x.GetExpression<T>()));
-        }
+        #region IRulePolicy
 
         public bool EvaluateRules(object input) {
             return EvaluateRules(new[] { input });

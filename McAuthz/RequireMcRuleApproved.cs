@@ -51,7 +51,7 @@ namespace McAuthz
             if (context.User.Identity.IsAuthenticated) {
                 var claimsEvaluation = EvalateRulesOnClaims(context, controller);
 
-                var responseEvaluation = EvaluateRulesOnResponse(context, controller);
+                var responseEvaluation = EvaluateRulesOnResponseObject(context, controller);
 
 
                 return claimsEvaluation && responseEvaluation;
@@ -60,7 +60,7 @@ namespace McAuthz
             return false;
         }
 
-        private bool EvaluateRulesOnResponse(AuthorizationHandlerContext context, string controller) {
+        private bool EvaluateRulesOnResponseObject(AuthorizationHandlerContext context, string controller) {
 
             var resource = context.Resource;
 
