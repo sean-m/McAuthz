@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using McAuthz.Policy;
+using McAuthz.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
