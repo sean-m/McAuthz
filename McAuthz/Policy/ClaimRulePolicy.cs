@@ -70,7 +70,7 @@ namespace McAuthz.Policy
         }
 
 
-        #region IRulePolicy
+        #region RulePolicyInterface
 
         public bool EvaluateRules(object input) {
             return EvaluateRules(new[] { input });
@@ -82,7 +82,7 @@ namespace McAuthz.Policy
             return false;
         }
 
-        #endregion  // IRulePolicy_IExpressionRule
+        #endregion  // IRulePolicy
 
         #endregion  // methods
     }
