@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McAuthsz.Tests", "McAuthsz.Tests\McAuthsz.Tests.csproj", "{1623F76D-447C-43FA-94A9-C4DFB7A881AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McAuthz.Tests", "McAuthsz.Tests\McAuthz.Tests.csproj", "{1623F76D-447C-43FA-94A9-C4DFB7A881AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
