@@ -1,6 +1,7 @@
 ﻿using McAuthz.Interfaces;
 using McRule;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -75,17 +76,28 @@ namespace McAuthz.Policy
 
         #region RulePolicyInterface
 
-        public bool EvaluateRules(object input) {
-            return EvaluateRules(new[] { input });
+        public bool EvaluateRules(dynamic input) {
+            if (input is Claim c) {
+                return IdentityClaimsMatch(new[] { c });
+            }
+            return false;
         }
-        public bool EvaluateRules(IEnumerable<object> inputs) {
+        public bool EvaluateRules(IEnumerable<dynamic> inputs) {
             if (inputs is IEnumerable<Claim> c) {
                 return IdentityClaimsMatch(c);
+            } else { 
+                try {
+                    var claims = inputs.Where(x => x is Claim)?.Cast<Claim>();
+                    return IdentityClaimsMatch(claims);
+                }
+                catch {
+                    // FIXME Get logger and tell somebody about this.
+                }
             }
             return false;
         }
 
-        #endregion  // IRulePolicy
+        #endregion  // RulePolicyInterface
 
         #endregion  // methods
     }

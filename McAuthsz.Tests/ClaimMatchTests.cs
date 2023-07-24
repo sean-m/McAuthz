@@ -43,5 +43,39 @@ namespace McAuthsz.Tests {
 
             Assert.IsTrue(matchNotSean.EvaluateRules(claims));
         }
+
+        [Test]
+        public void TypeCheckPatternMatchingOnClaim() {
+            var msg = "Pattern matching should interpret this object as a Claim";
+            object me = new Claim("name", "Sean McArdle");
+            
+            var result = matchSean.EvaluateRules(me);
+            Assert.IsTrue(result, msg);
+        }
+
+        [Test]
+        public void TypeCheckPatternMatchingOnClaimCollection() {
+            var msg = "Pattern matching should interpret Claims as such via DLR";
+            var claims = new List<object>();
+            var me = new Claim("name", "Sean McArdle");
+            claims.Add(me);
+
+            // Let's add some junk that isn't a claim
+            var alsoMe = new { name = "Dad" };
+            claims.Add(alsoMe);
+
+            var result = matchSean.EvaluateRules(claims);
+            Assert.IsTrue(result, msg);
+
+
+            // Let's add some junk that isn't a claim
+            claims = new List<object>();
+            alsoMe = new { name = "Dad" };
+            claims.Add(alsoMe);
+            result = true;
+            result = matchSean.EvaluateRules(claims);
+            Assert.IsFalse(result, msg);
+        }
+
     }
 }
