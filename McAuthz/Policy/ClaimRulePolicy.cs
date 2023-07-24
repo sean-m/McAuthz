@@ -82,13 +82,15 @@ namespace McAuthz.Policy
             }
             return false;
         }
+
         public bool EvaluateRules(IEnumerable<dynamic> inputs) {
             if (inputs is IEnumerable<Claim> c) {
                 return IdentityClaimsMatch(c);
             } else { 
                 try {
                     var claims = inputs.Where(x => x is Claim)?.Cast<Claim>();
-                    return IdentityClaimsMatch(claims);
+                    if (claims == null) { return false; } 
+                    else { return IdentityClaimsMatch(claims); }
                 }
                 catch {
                     // FIXME Get logger and tell somebody about this.
