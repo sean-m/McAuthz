@@ -14,6 +14,8 @@ namespace McAuthsz.Tests {
             Route = "/api/User"
         };
 
+        ClaimRulePolicy uninitialized = new ClaimRulePolicy();
+
         [SetUp]
         public void Setup() {
 
@@ -46,7 +48,7 @@ namespace McAuthsz.Tests {
 
         [Test]
         public void TypeCheckPatternMatchingOnClaim() {
-            var msg = "Pattern matching should interpret this object as a Claim";
+            var msg = "Pattern matching should interpret this object as a Claim.";
             object me = new Claim("name", "Sean McArdle");
             
             var result = matchSean.EvaluateRules(me);
@@ -55,7 +57,7 @@ namespace McAuthsz.Tests {
 
         [Test]
         public void TypeCheckPatternMatchingOnClaimCollection() {
-            var msg = "Pattern matching should interpret Claims as such via DLR";
+            var msg = "Pattern matching should interpret Claims as such via DLR.";
             var claims = new List<object>();
             var me = new Claim("name", "Sean McArdle");
             claims.Add(me);
@@ -77,5 +79,22 @@ namespace McAuthsz.Tests {
             Assert.IsFalse(result, msg);
         }
 
+        [Test]
+        public void GracefullyHandleNullClaims() {
+            var msg = "Null objects should be handled gracefully. Since this runs inside an authorization rule, it should be true/false.";
+            
+            Claim nil = null;
+            Assert.DoesNotThrow(() => matchSean.EvaluateRules(nil), msg);
+
+            List<Claim> claimColl = null;
+            Assert.DoesNotThrow(() => matchSean.EvaluateRules(claimColl), msg);
+        }
+
+        [Test]
+        public void UninitializedPolicyShouldNotThrow() {
+            var me = new Claim("name", "Sean McArdle");
+            Assert.DoesNotThrow(() => uninitialized.EvaluateRules(me));
+            Assert.IsFalse(uninitialized.EvaluateRules(me));
+        }
     }
 }
