@@ -1,4 +1,5 @@
 ﻿using McAuthz.Interfaces;
+using McAuthz.Policy;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -74,11 +75,11 @@ namespace McAuthz
         private bool EvalateRulesOnClaims(AuthorizationHandlerContext context, string controller) {
             // Enumerate claims and evaluate rules on each one. Find any that match.
             var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
-            var rules = _rules(controller);
+            var rules = _rules(controller)?.Where(x => x is ClaimRulePolicy);
 
-            return claimsId.Any(id => {
-                return rules.Any(x => x.EvaluateRules(id.Claims));
-            });
+            return claimsId?.Any(id => {
+                return rules?.Any(x => x.EvaluateRules(id.Claims)) ?? false;
+            }) ?? false;
         }
     }
 }
