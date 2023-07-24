@@ -8,7 +8,7 @@ namespace McAuthz.Interfaces {
         public string TargetType { get; set; }
         public string Route { get; set; }
 
-        bool EvaluateRules(object inputs);
-        bool EvaluateRules(IEnumerable<object> inputs);
+        bool EvaluateRules(dynamic inputs);
+        bool EvaluateRules(IEnumerable<dynamic> inputs);
     }
 }
