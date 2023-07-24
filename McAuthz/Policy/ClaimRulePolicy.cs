@@ -41,6 +41,9 @@ namespace McAuthz.Policy
                     RuleOperator = PredicateExpressionPolicyExtensions.RuleOperator.And
                 };
 
+                // TODO benchmark this
+                rule.GetExpression<Claim>(); // Prime expression tree cache
+                
                 policyRules.Add(rule);
             }
         }
