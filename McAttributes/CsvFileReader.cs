@@ -203,7 +203,7 @@ namespace SMM
             }
 
             csvReader = new CsvFileReader(CsvPath);
-            var userType = typeof(Models.User);
+            var userType = typeof(T);
 
             foreach (var row in csvReader.ReadFileValues()) {
                 var columns = row.Keys.Where(k => !String.IsNullOrEmpty(row.GetValueOrDefault(k)));
@@ -221,5 +221,4 @@ namespace SMM
             context.SaveChanges();
         }
     }
-
 }
