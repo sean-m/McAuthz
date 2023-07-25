@@ -61,6 +61,5 @@ namespace McAuthz.Policy
 
         #endregion  RulePolicyInterface
         #endregion  methods
-
     }
 }

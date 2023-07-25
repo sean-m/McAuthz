@@ -82,7 +82,7 @@ var ruleProvider = new RuleProvider();
 builder.Services.AddAuthorization(options => {
     options.AddPolicy(
         Globals.McPolicy,
-        policyBuilder => policyBuilder.AddRequirements(new RequireMcRuleApproved(ruleProvider.Rules))
+        policyBuilder => policyBuilder.AddRequirements(new RequireMcRuleApproved(ruleProvider.Policies))
     );
 });
 builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
@@ -172,8 +172,12 @@ public class RuleProvider : RuleProviderInterface {
         }
     };
 
-    public IEnumerable<RulePolicy> Rules(string route) {
+    public IEnumerable<RulePolicy> Policies(string route) {
         System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules() : Rule set fetched.");
         return RulesCollection.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    public IEnumerable<RulePolicy> Policies(Type type) {
+        throw new NotImplementedException();
     }
 }
