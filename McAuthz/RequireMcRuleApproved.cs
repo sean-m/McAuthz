@@ -68,7 +68,7 @@ namespace McAuthz
             // If you wanna look at nothing, be my guest
             if (resource == null) return true;
 
-            var rules = _rules(controller);
+            var rules = _rules(controller)?.Where(x => x is ResourceRulePolicy);
             return rules.Any(x => x.EvaluateRules(resource));
         }
 
