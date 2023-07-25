@@ -75,7 +75,7 @@ namespace McAuthz.Tests {
         theif = 16,
         bard = 32,
         fighter = 64,
-        ragner = 128,
+        ranger = 128,
         warlock = 256,
         monk = 512,
     }
