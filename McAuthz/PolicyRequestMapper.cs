@@ -24,11 +24,16 @@ namespace McAuthz
             if (context.User.Identity.IsAuthenticated) {
                 
                 var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
-                
-                return claimsId.Any(id =>
-                    _rules.Where(x => x.Route.Equals(context.Request.Path))
-                        .Any(x => x.IdentityClaimsMatch(id.Claims)));
+                var rules = _rules.Where(x => x.Route.Equals(context.Request.Path));
+
+                // For all authenticated identities, enumerate claims, evaluate against
+                // rules for any matches.
+                return claimsId?.Any(id =>
+                    id.Claims.Any(claim => rules?.Any(rule => rule.IdentityClaimsMatch(claim)) 
+                        ?? false)) 
+                    ?? false;
             }
+
             return false;
         }
     }

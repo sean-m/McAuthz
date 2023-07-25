@@ -56,7 +56,7 @@ namespace McAuthz.Policy
 
         private Func<Claim, bool>? _rule;
         private string? _ruleString;
-        public bool IdentityClaimsMatch(IEnumerable<Claim> claims)
+        public bool IdentityClaimsMatch(Claim claim)
         {
             if (_rule == null)
             {
@@ -66,7 +66,7 @@ namespace McAuthz.Policy
             }
             if (_rule == null) return false;
 
-            var policyResult = claims.Any(c => _rule.Invoke(c));
+            var policyResult = _rule.Invoke(claim);
 
             System.Diagnostics.Trace.WriteLineIf(!string.IsNullOrEmpty(_ruleString), $"Policy rule '{_ruleString}' evaluated: {policyResult}");
 
@@ -78,19 +78,19 @@ namespace McAuthz.Policy
 
         public bool EvaluateRules(dynamic input) {
             if (input is Claim c) {
-                return IdentityClaimsMatch(new[] { c });
+                return IdentityClaimsMatch(c);
             }
             return false;
         }
 
         public bool EvaluateRules(IEnumerable<dynamic> inputs) {
-            if (inputs is IEnumerable<Claim> c) {
+            if (inputs is Claim c) {
                 return IdentityClaimsMatch(c);
-            } else { 
+            } else if (inputs is IEnumerable){ 
                 try {
                     var claims = inputs.Where(x => x is Claim)?.Cast<Claim>();
                     if (claims == null) { return false; } 
-                    else { return IdentityClaimsMatch(claims); }
+                    else { return claims.Any(c => IdentityClaimsMatch(c)); }
                 }
                 catch {
                     // FIXME Get logger and tell somebody about this.
@@ -100,7 +100,6 @@ namespace McAuthz.Policy
         }
 
         #endregion  // RulePolicyInterface
-
         #endregion  // methods
     }
 }

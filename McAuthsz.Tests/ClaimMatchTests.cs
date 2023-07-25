@@ -92,9 +92,10 @@ namespace McAuthsz.Tests {
 
         [Test]
         public void UninitializedPolicyShouldNotThrow() {
+            var msg = "Uninitialized rules shouldn't throw.";
             var me = new Claim("name", "Sean McArdle");
-            Assert.DoesNotThrow(() => uninitialized.EvaluateRules(me));
-            Assert.IsFalse(uninitialized.EvaluateRules(me));
+            Assert.DoesNotThrow(() => uninitialized.EvaluateRules(me), msg);
+            Assert.IsFalse(uninitialized.EvaluateRules(me), msg);
         }
     }
 }
