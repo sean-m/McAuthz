@@ -1,7 +1,7 @@
 using McAuthz.Policy;
 using System.Security.Claims;
 
-namespace McAuthsz.Tests {
+namespace McAuthz.Tests {
     public class ClaimMatchTests {
 
         ClaimRulePolicy matchSean = new ClaimRulePolicy(
