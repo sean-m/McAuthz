@@ -7,18 +7,25 @@ using System.Text;
 
 namespace McAuthz.Policy
 {
-    public class RulePolicyBase : IExpressionRule
+    public class RulePolicyBase : IExpressionRuleCollection
     {
 
         public new string TargetType { get; set; }
         public string Route { get; set; }
-        string IExpressionRule.TargetType { get => TargetType; set => TargetType = value; }
 
-        internal List<IExpressionRule> policyRules = new List<IExpressionRule>();
+        public Guid Id => throw new NotImplementedException();
+
+
+        public RuleOperator RuleOperator => throw new NotImplementedException();
+
+        IEnumerable<IExpressionPolicy> IExpressionRuleCollection.Rules => Rules;
+
+        public List<IExpressionPolicy> Rules = new List<IExpressionPolicy>();
         public Expression<Func<T, bool>>? GetExpression<T>()
         {
+            var generator = PredicateExpressionPolicyExtensions.GetCoreExpressionGenerator();
             return PredicateExpressionPolicyExtensions.CombineAnd(
-                policyRules.Select(x => x.GetExpression<T>() ?? PredicateBuilder.False<T>()));
+                Rules.Select(x => x.GetPredicateExpression<T>() ?? PredicateBuilder.False<T>()));
         }
     }
 }

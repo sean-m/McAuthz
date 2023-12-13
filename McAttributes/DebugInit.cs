@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Npgsql;
+using SMM;
 using System.Linq;
 using System.Reflection;
 
@@ -12,73 +13,6 @@ namespace McAttributes {
             if (conn.State != System.Data.ConnectionState.Open) {
                 throw new Exception("Database connection is borkened. I need a working/opened one!");
             }
-
-            /*
-            string userTableSchema = @"
-
--- Make the User table
-create table if not exists azusers (
-    id integer PRIMARY KEY,
-    merged TIMESTAMP default null,
-    modified TIMESTAMP default null,
-    lastFetched TIMESTAMP default null,
-    created TIMESTAMP default null,
-    enabled BOOLEAN,
-    tenant TEXT,
-    aadId UUID UNIQUE,
-    upn TEXT,
-    mail TEXT,
-    employeeId TEXT,
-    adEmployeeId TEXT,
-    hrEmployeeId TEXT,
-    wid TEXT,
-    creationType TEXT,
-    company TEXT,
-    displayName TEXT,
-    preferredGivenName TEXT,
-    preferredSurname TEXT,
-    articles TEXT,
-    pronouns TEXT
-);
-
-delete from azusers;
-
-
-
-create table if not exists EmployeeIdRecord (
-    id integer PRIMARY KEY,
-    partitionKey text,
-    rowKey text,
-    cloudAnchor text not null,
-    userPrincipalName text not null,
-    employeeId text null,
-    adEmployeeId text null
-);
-
-delete from EmployeeIdRecord;
-
-
-
---drop table if exists IssueLogEntry;
-create table if not exists IssueLogEntry (
-    id integer primary key,
-    created TIMESTAMP default CURRENT_TIMESTAMP,
-    targetUserId integer,
-    level integer default 1,
-    entryId integer,
-    message text, 
-    acknowledged boolean,
-    resolved boolean,
-
-    FOREIGN KEY(TargetUserId) REFERENCES azusers(id)
-);
-
-";
-            
-            
-            var userTableCmd = new SqliteCommand(userTableSchema, conn);
-            userTableCmd.ExecuteNonQuery();
-            */
 
             var csvReader = new CsvFileReader(@"./test_values.csv", true);
             var _ = csvReader.ReadFileValues().FirstOrDefault();

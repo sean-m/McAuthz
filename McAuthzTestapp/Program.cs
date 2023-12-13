@@ -28,11 +28,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters.NameClaimType = "name";
     }, options => { builder.Configuration.Bind("AzureAd", options); });
 
-builder.Services.AddAuthorization(config =>
-{
-    config.AddPolicy("AuthZPolicy", policyBuilder =>
-        policyBuilder.Requirements.Add(new ScopeAuthorizationRequirement() { RequiredScopesConfigurationKey = $"AzureAd:Scopes" }));
-});
 
 
 //builder.Services.AddAuthentication(options => {
@@ -42,8 +37,13 @@ builder.Services.AddAuthorization(config =>
 //    builder.Configuration.Bind("AzureAD", options);
 //});
 
-// McAuthorization Setup
+builder.Services.AddAuthorization(config => {
+    config.AddPolicy("AuthZPolicy", policyBuilder =>
+        policyBuilder.Requirements.Add(new ScopeAuthorizationRequirement() { RequiredScopesConfigurationKey = $"AzureAd:Scopes" }));
+});
 
+
+// McAuthorization Setup
 var ruleProvider = new RuleProvider();
 builder.Services.AddAuthorization(options => {
     options.AddPolicy(

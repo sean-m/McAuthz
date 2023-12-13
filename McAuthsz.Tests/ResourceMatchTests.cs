@@ -31,7 +31,7 @@ namespace McAuthz.Tests {
             Monsters = SMM.CsvFileReader.GetRecords<NPC>("./TestData/monsters.csv").ToList();
             NPCs = SMM.CsvFileReader.GetRecords<NPC>("./TestData/npcs.csv").ToList();
 
-            RuleProvider = new Plumbing.RuleProvider();
+            RuleProvider = new RuleProvider();
             var _rules = new List<RulePolicy>();
             var neutralMonstersOnly = new ResourceRulePolicy<NPC>(
                 new[] {
@@ -115,7 +115,6 @@ namespace McAuthz.Tests {
             Speed = speed;
         }
     }
-
     public class NPC {
         public string Type { get; set; }
         public string Name { get; init; }

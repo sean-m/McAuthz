@@ -21,11 +21,11 @@ namespace McAuthz.Policy
 
         public ResourceRulePolicy (IEnumerable<(string, string)> ResourceMatches) {
             foreach (var m in ResourceMatches) {
-                policyRules.Add(new ExpressionRule(TargetType, m.Item1, m.Item2));
+                Rules.Add(new ExpressionRule(TargetType, m.Item1, m.Item2));
             }
         }
 
-        #endregion
+        #endregion  constructors
 
         #region methods
 

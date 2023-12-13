@@ -8,8 +8,8 @@ namespace McAttributes.Models
     {
         [Key]
         public int Id { get; set; }
-        public string CloudSourceAnchor { get; set; }
-        public string UserPrincipalName { get; set; }
+        public string? CloudSourceAnchor { get; init; }
+        public string? UserPrincipalName { get; init; }
         public string? EmployeeId { get; set; }
         public string? AdEmployeeId { get; set; }
 

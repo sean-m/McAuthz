@@ -24,7 +24,7 @@ namespace McAuthz.Policy
         #region constructor
 
         public ClaimRulePolicy() { }
-            
+
         public ClaimRulePolicy(IEnumerable<(string, string)> ClaimMatches)
         {
             foreach (var claimMatch in ClaimMatches)
@@ -39,13 +39,13 @@ namespace McAuthz.Policy
                             new ExpressionRule((TargetType, "Type", claimMatch.Item1)),
                             new ExpressionRule((TargetType, "Value", claimMatch.Item2))
                         },
-                    RuleOperator = PredicateExpressionPolicyExtensions.RuleOperator.And
+                    RuleOperator = RuleOperator.And
                 };
 
                 // TODO benchmark this
-                rule.GetExpression<Claim>(); // Prime expression tree cache
-                
-                policyRules.Add(rule);
+                rule.GetPredicateExpression<Claim>(); // Prime expression tree cache
+
+                Rules.Add(rule);
             }
         }
 
@@ -86,10 +86,10 @@ namespace McAuthz.Policy
         public bool EvaluateRules(IEnumerable<dynamic> inputs) {
             if (inputs is Claim c) {
                 return IdentityClaimsMatch(c);
-            } else if (inputs is IEnumerable){ 
+            } else if (inputs is IEnumerable){
                 try {
                     var claims = inputs.Where(x => x is Claim)?.Cast<Claim>();
-                    if (claims == null) { return false; } 
+                    if (claims == null) { return false; }
                     else { return claims.Any(c => IdentityClaimsMatch(c)); }
                 }
                 catch {

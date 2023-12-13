@@ -15,7 +15,7 @@ namespace McAttributes.Controllers {
 
         [HttpGet]
         [Authorize]
-        public object Get() {
+        public object? Get() {
             return HttpContext.User?.Identity;
         }
     }
