@@ -14,12 +14,13 @@ namespace McAttributes.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     [McAuthorize]
     public class UserController : ODataController {
 
         ILogger _logger;
         readonly DbContext _ctx;
-        
+
         public UserController(ILogger<UserController> logger, IdDbContext dbContext) {
             _logger = logger;
             _ctx = dbContext;

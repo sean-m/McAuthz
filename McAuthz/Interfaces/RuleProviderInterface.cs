@@ -4,7 +4,7 @@ using System.Text;
 
 namespace McAuthz.Interfaces {
     public interface RuleProviderInterface {
-        IEnumerable<RulePolicy> Policies(string route);
+        IEnumerable<RulePolicy> Policies(string route, string action);
         IEnumerable<RulePolicy> Policies(Type type);
     }
 }

@@ -24,29 +24,6 @@ namespace McAttributes.Data
                     .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Throw);
             });
 
-            //builder.Entity<EmployeeIdRecord>().Property(e => e.ConcurrencyId)
-            //    .ForNpgsqlHasColumnName("xmin")
-            //    .ForNpgsqlHasColumnType("xid")
-            //    .ValueGeneratedOnAddOrUpdate()
-            //    .IsConcurrencyToken();
-
-            //// AadId should be unique
-            //builder.Entity<IssueLogEntry>()
-            //    .ForNpgsqlUseXminAsConcurrencyToken()
-            //    .HasIndex(u => u.AlertHash)
-            //    .IsUnique();
-
-            //// AadId should be unique
-            //builder.Entity<User>()
-            //    .ForNpgsqlUseXminAsConcurrencyToken()
-            //    .HasIndex(u => u.AadId)
-            //    .IsUnique();
-
-            //// Index Mail and EmployeeId
-            //builder.Entity<User>()
-            //    .ForNpgsqlUseXminAsConcurrencyToken()
-            //    .HasIndex(u => u.Mail)
-            //    .HasIndex(u => u.EmployeeId);
         }
     }
 }

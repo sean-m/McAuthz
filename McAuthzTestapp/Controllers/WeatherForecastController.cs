@@ -1,9 +1,11 @@
+using McAuthz;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 
 namespace McAuthzTestapp.Controllers {
     [Authorize]
+    [McAuthorize]
     [ApiController]
     [Route("[controller]")]
     //[Authorize(Policy = McAuthz.Globals.McPolicy)]

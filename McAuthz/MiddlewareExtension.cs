@@ -10,8 +10,7 @@ using System.Text;
 namespace McAuthz {
 
     public static class Extensions {
-        public static IApplicationBuilder UseMcRequestAuthorizationPolicy(this IApplicationBuilder app) {
-                        
+        public static IApplicationBuilder UseMcAuthorization(this IApplicationBuilder app) {
             return app.UseMiddleware<McAuthorizationMiddleware>();
         }
     }

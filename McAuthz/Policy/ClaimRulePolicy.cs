@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
@@ -17,6 +18,8 @@ namespace McAuthz.Policy
         public string TargetType { get => "Claim"; set => _ = value; }
 
         public string Route { get; set; } = "*";
+
+        public string Action { get; set; } = "GET";
 
         #endregion  // properties
 
@@ -68,7 +71,7 @@ namespace McAuthz.Policy
 
             var policyResult = _rule.Invoke(claim);
 
-            System.Diagnostics.Trace.WriteLineIf(!string.IsNullOrEmpty(_ruleString), $"Policy rule '{_ruleString}' evaluated: {policyResult}");
+            System.Diagnostics.Debug.WriteLineIf(!string.IsNullOrEmpty(_ruleString), $"Policy rule '{_ruleString}' evaluated: {policyResult}");
 
             return policyResult;
         }
@@ -84,6 +87,7 @@ namespace McAuthz.Policy
         }
 
         public bool EvaluateRules(IEnumerable<dynamic> inputs) {
+            // Evaluate individual claims or lists of claims one at a time against the rule set
             if (inputs is Claim c) {
                 return IdentityClaimsMatch(c);
             } else if (inputs is IEnumerable){

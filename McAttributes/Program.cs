@@ -27,9 +27,9 @@ static IEdmModel GetEdmModel() {
     users.EntityType.Ignore(u => u.Pronouns);
 
     edmBuilder.EntitySet<IssueLogEntry>("IssueLogEntry");
-    
+
     edmBuilder.EntitySet<Stargate>("Stargate");
-    
+
     return edmBuilder.GetEdmModel();
 }
 
@@ -105,13 +105,9 @@ builder.Logging.AddConsole();
 
 
 
-var connString = builder.Configuration.GetConnectionString("Identity");
-var conn = new Npgsql.NpgsqlConnection(connString);
+var connString = "Data Source=test.db";
 builder.Services.AddDbContext<IdDbContext>(
-    options => { options.UseNpgsql(conn); });
-
-//builder.Services.AddDbContext<IdDbContext>(
-//    options => { options.UseSqlServer(connString); });
+    options => { options.UseSqlite(connString); });
 
 var app = builder.Build();
 
@@ -124,7 +120,7 @@ using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory
     var idDbContext = serviceScope.ServiceProvider.GetRequiredService<IdDbContext>();
     if (idDbContext.Database.EnsureCreated()) {
         if (!builder.Environment.IsProduction()) {
-            // Initialize the database with test data when running in 
+            // Initialize the database with test data when running in
             // debug mode and having just created tables.
             System.Diagnostics.Trace.WriteLine("Initialized database tables. Loading table data from test_values.csv.");
             DebugInit.DbInit(idDbContext);
@@ -143,14 +139,14 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthentication();
-app.UseAuthorization();
+
+//app.UseMcAuthorization();
 
 app.MapControllers();
 
 app.UseRouting();
 
 app.UseAuthorization();
-
 
 app.MapRazorPages();
 app.MapControllers();
@@ -167,14 +163,18 @@ public class RuleProvider : RuleProviderInterface {
 
     public IEnumerable<RulePolicy> RulesCollection { get; internal set; } = new List<RulePolicy> {
         new ClaimRulePolicy(
-            new[] { ("name", "Sean McArdle") }) {
-            Route = "/api/User"
+            new[] { ("~name", "~Sean McArdle") }) {
+            Route = "User",
+            Action = "GET"
         }
     };
 
-    public IEnumerable<RulePolicy> Policies(string route) {
+    public IEnumerable<RulePolicy> Policies(string route, string action="GET") {
         System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules() : Rule set fetched.");
-        return RulesCollection.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
+        return RulesCollection.Where(x =>
+            x.Route == "*"
+            || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase)
+                && x.Action.Equals(action, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public IEnumerable<RulePolicy> Policies(Type type) {

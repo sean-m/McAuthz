@@ -1,3 +1,4 @@
+using McAuthz;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web;
 

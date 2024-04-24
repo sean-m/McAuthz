@@ -30,7 +30,7 @@ namespace McAuthz
                 // rules for any matches.
                 return claimsId?.Any(id =>
                     id.Claims.Any(claim => rules?.Any(rule => rule.IdentityClaimsMatch(claim)) 
-                        ?? false)) 
+                        ?? false))
                     ?? false;
             }
 
