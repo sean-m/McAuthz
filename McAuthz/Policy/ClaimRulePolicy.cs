@@ -15,7 +15,7 @@ namespace McAuthz.Policy
     public class ClaimRulePolicy : RulePolicyBase, RulePolicy {
 
         #region properties
-        public string TargetType { get => "Claim"; set => _ = value; }
+        public string TargetType { get => "ClaimSet"; set => _ = value; }
 
         public string Route { get; set; } = "*";
 
@@ -30,26 +30,19 @@ namespace McAuthz.Policy
 
         public ClaimRulePolicy(IEnumerable<(string, string)> ClaimMatches)
         {
-            foreach (var claimMatch in ClaimMatches)
-            {
-                // Create a rule with two predicates to inspect a claim.
-                // Claims denote the name of the claim in the Type property
-                // and their value in the Value property, so both must match
-                // for the rule to evaluate True.
-                var rule = new ExpressionRuleCollection
-                {
-                    Rules = new List<ExpressionRule>() {
-                            new ExpressionRule((TargetType, "Type", claimMatch.Item1)),
-                            new ExpressionRule((TargetType, "Value", claimMatch.Item2))
-                        },
-                    RuleOperator = RuleOperator.And
-                };
+            // Create a rule with two predicates to inspect a claim.
+            // Claims denote the name of the claim in the Type property
+            // and their value in the Value property, so both must match
+            // for the rule to evaluate True.
+            var rule = new ExpressionPolicy {
+                Rules = ClaimMatches.Select(x => new ExpressionRule((TargetType, x.Item1, x.Item2))).ToList(),
+                RuleOperator = RuleOperator.And
+            };
 
-                // TODO benchmark this
-                rule.GetPredicateExpression<Claim>(); // Prime expression tree cache
+            // TODO benchmark this
+            rule.GetPredicateExpression<ClaimSet>(); // Prime expression tree cache
 
-                Rules.Add(rule);
-            }
+            Rules.Add(rule);
         }
 
         #endregion  // constructor
@@ -57,53 +50,96 @@ namespace McAuthz.Policy
 
         #region methods
 
-        private Func<Claim, bool>? _rule;
+        private Func<ClaimSet, bool>? _ruleSet;
         private string? _ruleString;
-        public bool IdentityClaimsMatch(Claim claim)
+        internal bool IdentityClaimsMatch(Claim claim)
         {
-            if (_rule == null)
+            var claimSet = new ClaimSet(new[] { claim });
+            if (_ruleSet == null)
             {
-                var ruleExpression = GetExpression<Claim>();
+                var ruleExpression = GetExpression<ClaimSet>();
                 _ruleString = ruleExpression?.ToString();
-                _rule = ruleExpression?.Compile();
+                _ruleSet = ruleExpression?.Compile();
             }
-            if (_rule == null) return false;
+            if (_ruleSet == null) return false;
 
-            var policyResult = _rule.Invoke(claim);
+            var policyResult = _ruleSet.Invoke(claimSet);
 
             System.Diagnostics.Debug.WriteLineIf(!string.IsNullOrEmpty(_ruleString), $"Policy rule '{_ruleString}' evaluated: {policyResult}");
 
             return policyResult;
         }
 
+        internal bool IdentityClaimsMatch(ClaimSet claim) {
+            if (_ruleSet == null) {
+                var ruleExpression = GetExpression<ClaimSet>();
+                _ruleString = ruleExpression?.ToString();
+                _ruleSet = ruleExpression?.Compile();
+            }
+            if (_ruleSet == null) return false;
+
+            var policyResult = _ruleSet.Invoke(claim);
+
+            System.Diagnostics.Debug.WriteLineIf(!string.IsNullOrEmpty(_ruleString), $"Policy rule '{_ruleString}' evaluated: {policyResult}");
+
+            return policyResult;
+        }
 
         #region RulePolicyInterface
 
-        public bool EvaluateRules(dynamic input) {
-            if (input is Claim c) {
-                return IdentityClaimsMatch(c);
-            }
-            return false;
-        }
-
-        public bool EvaluateRules(IEnumerable<dynamic> inputs) {
+        public bool EvaluateRules(dynamic inputs) {
             // Evaluate individual claims or lists of claims one at a time against the rule set
+            var result = false;
             if (inputs is Claim c) {
-                return IdentityClaimsMatch(c);
-            } else if (inputs is IEnumerable){
+                result = IdentityClaimsMatch(c);
+            } else if (inputs is IEnumerable<dynamic> en){
                 try {
-                    var claims = inputs.Where(x => x is Claim)?.Cast<Claim>();
-                    if (claims == null) { return false; }
-                    else { return claims.Any(c => IdentityClaimsMatch(c)); }
+
+                    var claims = Enumerable.Where(en, x => x is Claim)?.Cast<Claim>();
+                    var claimSet = new ClaimSet(claims);
+                    if (claims == null) {
+                        // TODO LOG no claims given as inputs, denied
+                        return false;
+                    }
+                    else {
+                        result = IdentityClaimsMatch(claimSet);
+                    }
                 }
                 catch {
                     // FIXME Get logger and tell somebody about this.
                 }
             }
-            return false;
+            return result;
         }
 
         #endregion  // RulePolicyInterface
         #endregion  // methods
+
+
+        internal class ClaimSet : Dictionary<string, List<string>> {
+
+            public ClaimSet() { }
+            public ClaimSet(IEnumerable<Claim> claims) {
+                foreach (Claim claim in claims) {
+                    SafeAdd(claim.Type, claim.Value);
+                }
+            }
+
+            private void SafeAdd(string key, List<string> value) {
+                if (this.ContainsKey(key)) {
+                    this[key].Concat(value);
+                } else {
+                    Add(key, value);
+                }
+            }
+
+            private void SafeAdd(string key, string value) {
+                if (this.ContainsKey(key)) {
+                    this[key].Concat(new[] { value });
+                } else {
+                    Add(key, new[] { value }.ToList());
+                }
+            }
+        }
     }
 }

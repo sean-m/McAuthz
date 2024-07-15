@@ -25,9 +25,9 @@ namespace McAuthz.Policy
         IDictionary<string, string[]> IExpressionRuleCollection.Properties => throw new NotImplementedException();
 
         public List<IExpressionPolicy> Rules = new List<IExpressionPolicy>();
+
         public Expression<Func<T, bool>>? GetExpression<T>()
         {
-            var generator = PredicateExpressionPolicyExtensions.GetCoreExpressionGenerator();
             return PredicateExpressionPolicyExtensions.CombineAnd(
                 Rules.Select(x => x.GetPredicateExpression<T>() ?? PredicateBuilder.False<T>()));
         }

@@ -7,10 +7,8 @@ namespace McAuthz.Interfaces {
     public interface RulePolicy {
         public string TargetType { get; set; }
         public string Route { get; set; }
-
         public string Action { get; set; }
 
         bool EvaluateRules(dynamic inputs);
-        bool EvaluateRules(IEnumerable<dynamic> inputs);
     }
 }

@@ -68,9 +68,12 @@ namespace McAuthz
             var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
             var rules = _rules(route, action)?.Where(x => x is ClaimRulePolicy);
 
-            return claimsId?.Any(id => {
+
+            var result =  claimsId?.Any(id => { // For all authenticated identities
                 return rules?.Any(x => x.EvaluateRules(id.Claims)) ?? false;
             }) ?? false;
+
+            return result;
         }
     }
 }

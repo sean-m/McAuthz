@@ -6,14 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McRule" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.9" />
+    <PackageReference Include="McRule" Version="0.4.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Metadata" Version="7.0.9" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Metadata" Version="8.0.7" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.10.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
