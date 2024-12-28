@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace McAuthz.Tests.Plumbing {
 
     // The intent of the RuleProviderInterface is that an application
-    // can create it's own collection of rules that can be loaded 
+    // can create it's own collection of rules that can be loaded
     // just-in-time when evaluating them. Or not, the provider could
-    // had back the same set of rules every time, like this one does.
-    // I wrote it just for testing the authorization middleware, probably
+    // hand back the same set of rules every time, like this one does.
+    // I wrote it for testing the authorization middleware, probably
     // shouldn't use it in your own stuff.
     // Sean McArdle  - 07/2023
     public class RuleProvider : RuleProviderInterface {
@@ -29,5 +29,8 @@ namespace McAuthz.Tests.Plumbing {
             return PolicyCollection.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
         }
 
+        public IEnumerable<RulePolicy> Policies(string route, string action) {
+            throw new NotImplementedException();
+        }
     }
 }

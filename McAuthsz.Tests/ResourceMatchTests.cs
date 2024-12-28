@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit;
 
 namespace McAuthz.Tests {
     /* This tests the capabilities of using rules for resource based authorization.
