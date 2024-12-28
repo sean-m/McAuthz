@@ -9,10 +9,9 @@ namespace McAuthz.Policy
 {
     public class RulePolicyBase : IExpressionRuleCollection
     {
-
+        public string Name { get; set; }
         public new string TargetType { get; set; }
         public string Route { get; set; }
-
         public string Action { get; set; }
 
         public Guid Id => throw new NotImplementedException();
@@ -31,5 +30,7 @@ namespace McAuthz.Policy
             return PredicateExpressionPolicyExtensions.CombineAnd(
                 Rules.Select(x => x.GetPredicateExpression<T>() ?? PredicateBuilder.False<T>()));
         }
+
+        public override string ToString() => $"{Name} [{TargetType}] => {Route}/{Action}";
     }
 }
