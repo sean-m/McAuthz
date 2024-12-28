@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 namespace McAuthz
 {
     public class PolicyRequestMapper {
-        
+
         private ILogger<PolicyRequestMapper> _logger;
         private IEnumerable<ClaimRulePolicy> _rules;
 
@@ -22,14 +22,14 @@ namespace McAuthz
 
         internal bool IsAuthorized(HttpContext context) {
             if (context.User.Identity.IsAuthenticated) {
-                
+
                 var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
                 var rules = _rules.Where(x => x.Route.Equals(context.Request.Path));
 
                 // For all authenticated identities, enumerate claims, evaluate against
                 // rules for any matches.
                 return claimsId?.Any(id =>
-                    id.Claims.Any(claim => rules?.Any(rule => rule.IdentityClaimsMatch(claim)) 
+                    id.Claims.Any(claim => rules?.Any(rule => rule.IdentityClaimsMatch(claim))
                         ?? false))
                     ?? false;
             }

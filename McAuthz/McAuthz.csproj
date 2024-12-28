@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McRule" Version="0.4.2" />
+    <PackageReference Include="McRule" Version="0.4.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
