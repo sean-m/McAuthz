@@ -15,21 +15,24 @@ namespace McAuthz.Policy
     public class ClaimRulePolicy : RulePolicyBase, RulePolicy {
 
         #region properties
-        public string TargetType { get => "ClaimSet"; set => _ = value; }
-
-        public string Route { get; set; } = "*";
-
-        public string Action { get; set; } = "GET";
-
+        public new string TargetType {
+            get => base.TargetType ?? "ClaimSet";
+            set {
+                if (base.TargetType == null) { base.TargetType = value; }
+                else { _ = value; }
+            }
+        }
         #endregion  // properties
 
 
         #region constructor
 
-        public ClaimRulePolicy() { }
+        public ClaimRulePolicy() { init(); }
 
         public ClaimRulePolicy(IEnumerable<(string, string)> ClaimMatches)
         {
+            init();
+
             // Create a rule with two predicates to inspect a claim.
             // Claims denote the name of the claim in the Type property
             // and their value in the Value property, so both must match
@@ -43,6 +46,12 @@ namespace McAuthz.Policy
             rule.GetPredicateExpression<ClaimSet>(); // Prime expression tree cache
 
             Rules.Add(rule);
+        }
+
+        private void init() {
+            Route = "*";
+            Action = "GET";
+            TargetType = "ClaimSet";
         }
 
         #endregion  // constructor

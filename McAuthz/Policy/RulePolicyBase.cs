@@ -31,6 +31,6 @@ namespace McAuthz.Policy
                 Rules.Select(x => x.GetPredicateExpression<T>() ?? PredicateBuilder.False<T>()));
         }
 
-        public override string ToString() => $"{Name} [{TargetType}] => {Route}/{Action}";
+        public new string ToString() => $"{Name} [{TargetType}] => /{Route}:{Action}";
     }
 }
