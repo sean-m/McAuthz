@@ -11,7 +11,7 @@ using System.Text;
 namespace McAuthz
 {
     public class RequireMcRuleApproved : IAuthorizationRequirement {
-        private Func<string, string, IEnumerable<RulePolicy>> _rules;
+        private RuleProviderInterface  _rules;
 
         /// <summary>
         /// This is the requirement that associates McRule policies with a given
@@ -23,7 +23,7 @@ namespace McAuthz
         /// app down, what in the world are you doing with these rules?
         /// </summary>
         /// <param name="rules"></param>
-        public RequireMcRuleApproved(Func<string, string, IEnumerable<RulePolicy>> rules) {
+        public RequireMcRuleApproved(RuleProviderInterface rules) {
             _rules = rules;
         }
 
@@ -66,8 +66,7 @@ namespace McAuthz
         private bool EvalateRulesOnClaims(AuthorizationHandlerContext context, string route, string action) {
             // Enumerate claims and evaluate rules on each one. Find any that match.
             var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
-            var rules = _rules(route, action)?.Where(x => x is ClaimRulePolicy);
-
+            var rules = _rules.Policies(route, action)?.Where(x => x is ClaimRulePolicy);
 
             var result =  claimsId?.Any(id => { // For all authenticated identities
                 return rules?.Any(x => x.EvaluateRules(id.Claims)) ?? false;

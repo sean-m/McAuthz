@@ -20,6 +20,9 @@ using Microsoft.AspNetCore.Authorization;
 using McAuthz;
 using McAuthz.Policy;
 using McAuthz.Interfaces;
+using System.Data;
+using Microsoft.AspNetCore.Routing;
+using System;
 
 static IEdmModel GetEdmModel() {
     var edmBuilder = new ODataConventionModelBuilder();
@@ -75,6 +78,9 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI(); ;
 
+builder.Services.AddLogging(options => {
+    options.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information); });
+
 
 
 var ruleProvider = new RuleProvider();
@@ -82,7 +88,7 @@ var ruleProvider = new RuleProvider();
 builder.Services.AddAuthorization(options => {
     options.AddPolicy(
         Globals.McPolicy,
-        policyBuilder => policyBuilder.AddRequirements(new RequireMcRuleApproved(ruleProvider.Policies))
+        policyBuilder => policyBuilder.AddRequirements(new RequireMcRuleApproved(ruleProvider))
     );
 });
 builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
@@ -111,9 +117,6 @@ builder.Services.AddDbContext<IdDbContext>(
 
 var app = builder.Build();
 
-// Updating an entity bombs without this. Postgresql requires UTC timestamps and for whatever
-// reason, the default DateTime behavior is to just try shoving in a value with out a timezone.
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
 {
@@ -161,23 +164,42 @@ app.Run();
 
 public class RuleProvider : RuleProviderInterface {
 
-    public IEnumerable<RulePolicy> RulesCollection { get; internal set; } = new List<RulePolicy> {
+    private ILogger? logger;
+
+    public RuleProvider() { }
+    public RuleProvider(ILogger Logger) {
+        logger = Logger;
+    }
+
+    internal IEnumerable<RulePolicy> ClaimRulesCollection { get; set; } = new List<RulePolicy> {
         new ClaimRulePolicy(
-            new[] { ("~name", "~Sean McArdle") }) {
+            new[] {
+                ("name", "Sean McArdle"),
+                (@"http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin")
+            }) {
+            Name = "Sean with Admin role",
             Route = "User",
             Action = "GET"
-        }
+        },
     };
 
+    internal Dictionary<Type, IEnumerable<RulePolicy>> ResourcePolicies { get; set; } = new Dictionary<Type, IEnumerable<RulePolicy>>();
+
     public IEnumerable<RulePolicy> Policies(string route, string action="GET") {
-        System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules() : Rule set fetched.");
-        return RulesCollection.Where(x =>
+        logger?.LogInformation($"Getting claim policies for /{route} {action}");
+        return ClaimRulesCollection.Where(x =>
             x.Route == "*"
             || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase)
                 && x.Action.Equals(action, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public IEnumerable<RulePolicy> Policies(Type type) {
-        throw new NotImplementedException();
+        if (ResourcePolicies.ContainsKey(type)) {
+            logger?.LogInformation($"Getting type policies for {type.Name}");
+            return ResourcePolicies[type];
+        }
+
+        logger?.LogWarning($"No policies for type:{type.Name}, returning empty set!");
+        return Array.Empty<RulePolicy>();
     }
 }
