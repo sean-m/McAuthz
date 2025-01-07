@@ -72,7 +72,7 @@ namespace McAuthz
                 // rules for any matches.
                 bool ruleResult = claimsId?.Any(id =>
                     rules.Any(r => {
-                        var evaluation = r.EvaluateRules(id);
+                        var evaluation = r.EvaluatePrincipal(id);
                         if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
 
                         return evaluation;
@@ -88,7 +88,7 @@ namespace McAuthz
                 // rules for any matches.
                 bool ruleResult = claimsId?.Any(id =>
                     rules.Any(r => {
-                        var evaluation = r.EvaluateRules(id);
+                        var evaluation = r.EvaluatePrincipal(id);
                         if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
 
                         return evaluation;

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
@@ -28,7 +29,7 @@ namespace McAuthz
             string action = context.Request.Method;
             IEnumerable<RulePolicy> effectivePolicies = rules.Policies(path, action);
 
-            bool ruleResult;
+            bool principalRuleResult;
 
             if (context.User.Identity.IsAuthenticated) {
 
@@ -37,16 +38,16 @@ namespace McAuthz
 
                 // For all authenticated identities, enumerate claims, evaluate against
                 // rules for any matches.
-                ruleResult = claimsId?.Any(id =>
+                principalRuleResult = claimsId?.Any(id =>
                     rules.Any(r => {
-                        var evaluation = r.EvaluateRules(id);
+                        var evaluation = r.EvaluatePrincipal(id);
                         if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: '{r.Name}'. {action} {path}");
 
                         return evaluation;
                     }))
                     ?? false;
 
-                if (!ruleResult) {
+                if (!principalRuleResult) {
                     logger?.LogWarning($"No policies authorized {action} {path}");
                     logger?.LogDebug($"Allow Authenticated RulePolicy: {{'Name':'Allow Authenticated {action.ToUpper()} to {path}','Route':'{path}','Action':'{action}','Authentication':'Authenticated'}}");
                 }
@@ -57,23 +58,30 @@ namespace McAuthz
 
                 // For all authenticated identities, enumerate claims, evaluate against
                 // rules for any matches.
-                ruleResult = claimsId?.Any(id =>
+                principalRuleResult = claimsId?.Any(id =>
                     rules.Any(r => {
-                        var evaluation = r.EvaluateRules(id);
+                        var evaluation = r.EvaluatePrincipal(id);
                         if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
 
                         return evaluation;
                     }))
                     ?? false;
 
-                if (!ruleResult) {
+                if (!principalRuleResult) {
                     logger?.LogWarning($"No unauthenticated policies authorized {action} {path}");
                 }
             }
 
-            if (!ruleResult) logger?.LogDebug($"Allow Any RulePolicy: {{'Route':'{path}','Action':'{action}','Authentication':'Any'}}");
+            if (!principalRuleResult) logger?.LogDebug($"Allow Any RulePolicy: {{'Route':'{path}','Action':'{action}','Authentication':'Any'}}");
 
-            return ruleResult;
+            bool bodyRuleResult = true;
+            if (principalRuleResult) {
+
+
+            }
+            bodyEnd:
+
+            return principalRuleResult && bodyRuleResult;
         }
     }
 }

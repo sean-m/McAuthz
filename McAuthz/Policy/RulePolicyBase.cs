@@ -23,14 +23,18 @@ namespace McAuthz.Policy {
 
         public Guid Id => throw new NotImplementedException();
 
-        public virtual bool EvaluateRules(dynamic inputs) {
+        public virtual bool EvaluateBody(dynamic inputs) {
             return false;
         }
 
-        public virtual bool EvaluateRules(ClaimsPrincipal inputs) {
+        public virtual bool EvaluatePrincipal(dynamic inputs) {
             return false;
         }
 
-        public new string ToString() => $"{Name} [{TargetType}] => /{Route}:{Action}";
+        public virtual bool EvaluatePrincipal(ClaimsPrincipal inputs) {
+            return false;
+        }
+
+        public new string ToString() => $"{Name} [{TargetType}] => {Action?.ToUpper()} {Route}";
     }
 }

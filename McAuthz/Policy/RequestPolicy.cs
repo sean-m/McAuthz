@@ -28,6 +28,7 @@ namespace McAuthz.Policy {
         public IEnumerable<ClaimRequirement> ClaimRequirements { get => Requirements.Where(r => r is ClaimRequirement).Cast<ClaimRequirement>(); }
         public IEnumerable<ClaimExpression> ClaimExpressions { get => Requirements.Where(r => r is ClaimExpression).Cast<ClaimExpression>(); }
         public IEnumerable<RoleRequirement> RoleRequirements { get => Requirements.Where(r => r is RoleRequirement).Cast<RoleRequirement>(); }
+        public IEnumerable<ExpressionRequirement> ExpressionRequirements { get => Requirements.Where(x => x is ExpressionRequirement).Cast<ExpressionRequirement>(); }
 
         #endregion  // properties
 
@@ -85,9 +86,9 @@ namespace McAuthz.Policy {
             return result;
         }
 
-        #region RulePolicyInterface
+        #region InspectPrincipal
 
-        public new bool EvaluateRules(ClaimsPrincipal principal) {
+        public new bool EvaluatePrincipal(ClaimsPrincipal principal) {
             var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.ClaimName, x.ClaimValue)) : true;
 
             var claimExprEval = true;
@@ -97,7 +98,7 @@ namespace McAuthz.Policy {
             return claimEval && claimExprEval && roleEval;
         }
 
-        public bool EvaluateRules(ClaimsIdentity principal) {
+        public bool EvaluatePrincipal(ClaimsIdentity principal) {
             var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.ClaimName, x.ClaimValue)) : true;
 
             var claimExprEval = true;
@@ -108,17 +109,35 @@ namespace McAuthz.Policy {
             return claimEval && claimExprEval && roleEval;
         }
 
-        public bool EvaluateRules(dynamic inputs) {
+        public bool EvaluatePrincipal(dynamic inputs) {
             if (inputs == null) return false;
 
-            if (inputs is ClaimsIdentity ci) return EvaluateRules(ci);
-
-            if (inputs is ClaimsPrincipal cp) return EvaluateRules(cp);
+            if (inputs is ClaimsIdentity ci) return EvaluatePrincipal(ci);
+            if (inputs is ClaimsPrincipal cp) return EvaluatePrincipal(cp);
 
             throw new NotImplementedException($"Not implemented for input type:{inputs?.GetType().Name}");
         }
 
-        #endregion  // RulePolicyInterface
+        #endregion  // InspectPrincipal
+
+        #region InspectBody
+
+        public bool EvaluateBody(dynamic inputs) {
+            var expressions = ExpressionRequirements;
+
+            if (expressions.Count() == 0) return false;
+
+            foreach (var er in expressions) {
+                var expr = er.GetValue();
+                if (inputs) return true;
+            }
+
+            return false;
+        }
+
+        #endregion // InspectBody
+
+
         #endregion  // methods
 
     }

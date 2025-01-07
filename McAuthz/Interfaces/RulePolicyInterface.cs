@@ -12,7 +12,7 @@ namespace McAuthz.Interfaces {
         public string Action { get; set; }
         public AuthenticationStatus Authentication { get; set; }
 
-        bool EvaluateRules(dynamic inputs);
-        bool EvaluateRules(ClaimsPrincipal inputs);
+        bool EvaluatePrincipal(dynamic inputs);
+        bool EvaluateBody(dynamic inputs);
     }
 }
