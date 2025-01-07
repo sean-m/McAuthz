@@ -1,6 +1,7 @@
 ﻿using McAuthz.Interfaces;
 using McAuthz.Requirements;
 using McRule;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace McAuthz.Policy {
@@ -46,11 +48,42 @@ namespace McAuthz.Policy {
             TargetType = "ClaimSet";
         }
 
+
         #endregion  // constructor
 
 
         #region methods
 
+        public static RequestPolicy FromJson(string Input) {
+            var result = new RequestPolicy();
+            var json = JsonConvert.DeserializeObject<Dictionary<string,object>>(Input);
+
+            foreach (var key in json.Keys) {
+                if (key.Like("name")) {
+                    result.Name = json[key]?.ToString();
+                    continue;
+                }
+                if (key.Like("route")) {
+                    result.Route = json[key]?.ToString();
+                    continue;
+                }
+                if (key.Like("action")) {
+                    result.Action = json[key]?.ToString();
+                    continue;
+                }
+                if (key.Like("authentication")) {
+                    object stat;
+                    if (Enum.TryParse(typeof(AuthenticationStatus), json[key]?.ToString(), out stat)) {
+                        result.Authentication = (AuthenticationStatus)stat;
+                    } else {
+                        // TODO log this
+                    }
+                    continue;
+                }
+            }
+
+            return result;
+        }
 
         #region RulePolicyInterface
 

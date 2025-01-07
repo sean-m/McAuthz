@@ -40,13 +40,16 @@ namespace McAuthz
                 ruleResult = claimsId?.Any(id =>
                     rules.Any(r => {
                         var evaluation = r.EvaluateRules(id);
-                        if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
+                        if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: '{r.Name}'. {action} {path}");
 
                         return evaluation;
                     }))
                     ?? false;
 
-                if (!ruleResult) { logger?.LogWarning($"No policies authorized {action} {path}"); }
+                if (!ruleResult) {
+                    logger?.LogWarning($"No policies authorized {action} {path}");
+                    logger?.LogDebug($"Allow Authenticated RulePolicy: {{'Name':'Allow Authenticated {action.ToUpper()} to {path}','Route':'{path}','Action':'{action}','Authentication':'Authenticated'}}");
+                }
             } else {
 
                 var claimsId = context.User.Identities.Where(i => !i.IsAuthenticated);
@@ -63,8 +66,12 @@ namespace McAuthz
                     }))
                     ?? false;
 
-                if (!ruleResult) { logger?.LogWarning($"No unauthenticated policies authorized {action} {path}"); }
+                if (!ruleResult) {
+                    logger?.LogWarning($"No unauthenticated policies authorized {action} {path}");
+                }
             }
+
+            if (!ruleResult) logger?.LogDebug($"Allow Any RulePolicy: {{'Route':'{path}','Action':'{action}','Authentication':'Any'}}");
 
             return ruleResult;
         }
