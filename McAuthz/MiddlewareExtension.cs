@@ -23,7 +23,7 @@ namespace McAuthz {
         /// </param>
         /// <returns></returns>
         public static bool Like(this string Base, string Pattern, bool CaseSensitive = false) {
-            var pattern = WildCardToRegular(Pattern);
+            var pattern = $"^{WildCardToRegular(Pattern)}$";
             var options = RegexOptions.CultureInvariant | RegexOptions.IgnoreCase;  // Case insensitive is the default.
             if (CaseSensitive) { options = options ^ RegexOptions.IgnoreCase; }
             return Regex.IsMatch(Base, pattern, options);
@@ -35,7 +35,7 @@ namespace McAuthz {
         /// <param name="value"></param>
         /// <returns></returns>
         private static String WildCardToRegular(String value) {
-            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
+            return Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*");
         }
     }
 
