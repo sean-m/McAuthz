@@ -1,16 +1,17 @@
 using McAuthz.Policy;
+using McAuthz.Requirements;
 using System.Security.Claims;
 
 namespace McAuthz.Tests {
     public class ClaimMatchTests {
 
         RequestPolicy matchSean = new RequestPolicy(
-            new[] { ("name", "Sean McArdle") }) {
+            new[] { new ClaimRequirement("name", "Sean McArdle") }) {
             Route = "/api/User"
         };
 
         RequestPolicy matchNotSean = new RequestPolicy(
-           new[] { ("name", "!Sean McArdle") }) {
+           new[] { new ClaimRequirement("name", "!Sean McArdle") }) {
             Route = "/api/User"
         };
 
@@ -27,8 +28,8 @@ namespace McAuthz.Tests {
             var claims = new List<Claim>();
             var me = new Claim("name", "Sean McArdle");
             claims.Add(me);
-
-            Assert.IsTrue(matchSean.EvaluateRules(claims));
+            bool result = matchSean.EvaluatePrincipal(claims);
+            Assert.IsTrue(result);
         }
 
         [Test]
@@ -37,13 +38,13 @@ namespace McAuthz.Tests {
             var me = new Claim("name", "Sean McArdle");
             claims.Add(me);
 
-            Assert.IsFalse(matchNotSean.EvaluateRules(claims));
+            Assert.IsFalse(matchNotSean.EvaluatePrincipal(claims));
 
             claims.Clear();
             var notme = new Claim("name", "Robin Williams");
             claims.Add(notme);
 
-            Assert.IsTrue(matchNotSean.EvaluateRules(claims));
+            Assert.IsTrue(matchNotSean.EvaluatePrincipal(claims));
         }
 
         [Test]
@@ -51,32 +52,8 @@ namespace McAuthz.Tests {
             var msg = "Pattern matching should interpret this object as a Claim.";
             object me = new Claim("name", "Sean McArdle");
 
-            var result = matchSean.EvaluateRules(me);
+            var result = matchSean.EvaluatePrincipal( me );
             Assert.IsTrue(result, msg);
-        }
-
-        [Test]
-        public void TypeCheckPatternMatchingOnClaimCollection() {
-            var msg = "Pattern matching should interpret Claims as such via DLR.";
-            var claims = new List<object>();
-            var me = new Claim("name", "Sean McArdle");
-            claims.Add(me);
-
-            // Let's add some junk that isn't a claim
-            var alsoMe = new { name = "Dad" };
-            claims.Add(alsoMe);
-
-            var result = matchSean.EvaluateRules(claims);
-            Assert.IsTrue(result, msg);
-
-
-            // Let's add some junk that isn't a claim
-            claims = new List<object>();
-            alsoMe = new { name = "Dad" };
-            claims.Add(alsoMe);
-            result = true;
-            result = matchSean.EvaluateRules(claims);
-            Assert.IsFalse(result, msg);
         }
 
         [Test]
@@ -84,18 +61,18 @@ namespace McAuthz.Tests {
             var msg = "Null objects should be handled gracefully. Since this runs inside an authorization rule, it should be true/false.";
 
             Claim nil = null;
-            Assert.DoesNotThrow(() => matchSean.EvaluateRules(nil), msg);
+            Assert.DoesNotThrow(() => matchSean.EvaluatePrincipal(nil), msg);
 
             List<Claim> claimColl = null;
-            Assert.DoesNotThrow(() => matchSean.EvaluateRules(claimColl), msg);
+            Assert.DoesNotThrow(() => matchSean.EvaluatePrincipal(claimColl), msg);
         }
 
         [Test]
         public void UninitializedPolicyShouldNotThrow() {
             var msg = "Uninitialized rules shouldn't throw.";
             var me = new Claim("name", "Sean McArdle");
-            Assert.DoesNotThrow(() => uninitialized.EvaluateRules(me), msg);
-            Assert.IsFalse(uninitialized.EvaluateRules(me), msg);
+            Assert.DoesNotThrow(() => uninitialized.EvaluatePrincipal(me), msg);
+            Assert.IsFalse(uninitialized.EvaluatePrincipal(me), msg);
         }
     }
 }

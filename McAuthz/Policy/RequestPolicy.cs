@@ -114,8 +114,23 @@ namespace McAuthz.Policy {
 
             if (inputs is ClaimsIdentity ci) return EvaluatePrincipal(ci);
             if (inputs is ClaimsPrincipal cp) return EvaluatePrincipal(cp);
+            if (inputs is IEnumerable<Claim> lc) return EvaluateListOfClaims(lc.ToList());
+            if (inputs is Claim c) return EvaluateOnClaim(c);
 
             throw new NotImplementedException($"Not implemented for input type:{inputs?.GetType().Name}");
+        }
+
+        private bool EvaluateOnClaim(Claim claim) {
+            return ClaimRequirements.Any(x => x.EvaluateClaim(claim));
+        }
+
+        private bool EvaluateListOfClaims(List<Claim> lc) {
+
+            var claimEval = ClaimRequirements.Count() > 0
+                ? lc.All(claim => EvaluateOnClaim(claim))
+                : true;
+
+            return claimEval;
         }
 
         #endregion  // InspectPrincipal
