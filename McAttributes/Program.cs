@@ -1,28 +1,20 @@
 
 using McAttributes;
-using Microsoft.AspNetCore.OData;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using McAttributes.Data;
 using McAttributes.Models;
-using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NuGet.Configuration;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
+using McAuthz;
+using McAuthz.Interfaces;
+using McAuthz.Policy;
+using McAuthz.Requirements;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authorization;
-using McAuthz;
-using McAuthz.Policy;
-using McAuthz.Interfaces;
+using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web.UI;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using System.Data;
-using Microsoft.AspNetCore.Routing;
-using System;
 
 static IEdmModel GetEdmModel() {
     var edmBuilder = new ODataConventionModelBuilder();
@@ -38,6 +30,14 @@ static IEdmModel GetEdmModel() {
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Logging
+builder.Services.AddLogging(options => {
+    options.AddConsole();
+    options.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+});
+
 
 // Add and load configuration sources.
 #pragma warning disable ASP0013 // Suggest switching from using Configure methods to WebApplicationBuilder.Configuration
@@ -78,21 +78,20 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI(); ;
 
-builder.Services.AddLogging(options => {
-    options.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information); });
-
-
 
 var ruleProvider = new RuleProvider();
 
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy(
-        Globals.McPolicy,
-        policyBuilder => policyBuilder.AddRequirements(new RequireMcRuleApproved(ruleProvider))
-    );
-});
-builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
+builder.Services.AddSingleton<RuleProviderInterface>(ruleProvider);
+builder.Services.AddSingleton<PolicyRequestMapper>();
 
+//builder.Services.AddAuthorization(options => {
+//    options.AddPolicy(
+//        Globals.McPolicy,
+//        policyBuilder => policyBuilder.AddRequirements(
+//            new RequireMcRuleApproved(ruleProvider))
+//    );
+//});
+builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
 
 
 // Add services to the container.
@@ -143,12 +142,10 @@ app.UseStaticFiles();
 
 app.UseAuthentication();
 
-//app.UseMcAuthorization();
-
 app.MapControllers();
-
 app.UseRouting();
 
+app.UseMcAuthorization();
 app.UseAuthorization();
 
 app.MapRazorPages();
@@ -164,33 +161,40 @@ app.Run();
 
 public class RuleProvider : RuleProviderInterface {
 
-    private ILogger? logger;
+    private ILogger<RuleProvider>? logger;
 
     public RuleProvider() { }
-    public RuleProvider(ILogger Logger) {
+    public RuleProvider(ILogger<RuleProvider> Logger) {
         logger = Logger;
     }
 
     internal IEnumerable<RulePolicy> ClaimRulesCollection { get; set; } = new List<RulePolicy> {
-        new ClaimRulePolicy(
-            new[] {
-                ("name", "Sean McArdle"),
-                (@"http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin")
+        new RequestPolicy(
+            new Requirement[] {
+                new ClaimRequirement ("name", "Sean McArdle"),
+                new RoleRequirement ("Admin")
             }) {
             Name = "Sean with Admin role",
-            Route = "User",
+            Route = "/odata/User",
             Action = "GET"
+        },
+        new RequestPolicy(
+            new Requirement[] {}) {
+            Name = "All users can access the home page",
+            Route = "/",
+            Action = "GET",
+            Authentication = AuthenticationStatus.Any
         },
     };
 
     internal Dictionary<Type, IEnumerable<RulePolicy>> ResourcePolicies { get; set; } = new Dictionary<Type, IEnumerable<RulePolicy>>();
 
-    public IEnumerable<RulePolicy> Policies(string route, string action="GET") {
-        logger?.LogInformation($"Getting claim policies for /{route} {action}");
+    public IEnumerable<RulePolicy> Policies(string route, string method="GET") {
+        logger?.LogInformation($"Getting claim policies for /{route} {method}");
         return ClaimRulesCollection.Where(x =>
             x.Route == "*"
             || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase)
-                && x.Action.Equals(action, StringComparison.CurrentCultureIgnoreCase));
+                && x.Action.Equals(method, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public IEnumerable<RulePolicy> Policies(Type type) {

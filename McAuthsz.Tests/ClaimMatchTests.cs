@@ -4,17 +4,17 @@ using System.Security.Claims;
 namespace McAuthz.Tests {
     public class ClaimMatchTests {
 
-        ClaimRulePolicy matchSean = new ClaimRulePolicy(
+        RequestPolicy matchSean = new RequestPolicy(
             new[] { ("name", "Sean McArdle") }) {
             Route = "/api/User"
         };
 
-        ClaimRulePolicy matchNotSean = new ClaimRulePolicy(
+        RequestPolicy matchNotSean = new RequestPolicy(
            new[] { ("name", "!Sean McArdle") }) {
             Route = "/api/User"
         };
 
-        ClaimRulePolicy uninitialized = new ClaimRulePolicy();
+        RequestPolicy uninitialized = new RequestPolicy();
 
         [SetUp]
         public void Setup() {
@@ -50,7 +50,7 @@ namespace McAuthz.Tests {
         public void TypeCheckPatternMatchingOnClaim() {
             var msg = "Pattern matching should interpret this object as a Claim.";
             object me = new Claim("name", "Sean McArdle");
-            
+
             var result = matchSean.EvaluateRules(me);
             Assert.IsTrue(result, msg);
         }
@@ -82,7 +82,7 @@ namespace McAuthz.Tests {
         [Test]
         public void GracefullyHandleNullClaims() {
             var msg = "Null objects should be handled gracefully. Since this runs inside an authorization rule, it should be true/false.";
-            
+
             Claim nil = null;
             Assert.DoesNotThrow(() => matchSean.EvaluateRules(nil), msg);
 

@@ -3,15 +3,18 @@ using McAuthz.Policy;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
 namespace McAuthz
 {
     public class RequireMcRuleApproved : IAuthorizationRequirement {
-        private RuleProviderInterface  _rules;
+        private RuleProviderInterface  rules;
+        private ILogger? logger;
 
         /// <summary>
         /// This is the requirement that associates McRule policies with a given
@@ -23,14 +26,19 @@ namespace McAuthz
         /// app down, what in the world are you doing with these rules?
         /// </summary>
         /// <param name="rules"></param>
+        ///
         public RequireMcRuleApproved(RuleProviderInterface rules) {
-            _rules = rules;
+            this.rules = rules;
+        }
+        public RequireMcRuleApproved(ILogger logger, RuleProviderInterface rules) {
+            this.logger = logger;
+            this.rules = rules;
         }
 
         internal bool IsAuthorized(AuthorizationHandlerContext context) {
             var principal = context.User;
 
-            dynamic controller = "*";
+            dynamic path = "*";
             dynamic action = "GET";
 
             bool isResponse = false;
@@ -49,30 +57,46 @@ namespace McAuthz
                 }
             }
 
-            route.TryGetValue("controller", out controller);
+            route.TryGetValue("controller", out path);
             route.TryGetValue("action", out action);
 
             // Inspect the context using provided policy rules
+            IEnumerable<RulePolicy> effectivePolicies = rules.Policies(path.ToString(), action.ToString());
+
             if (context.User.Identity.IsAuthenticated) {
-                bool clamsEvaluation = false;
-                clamsEvaluation = EvalateRulesOnClaims(context, controller.ToString(), action.ToString());
 
-                return clamsEvaluation;
+                var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
+                var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.NotAuthenticated);
+
+                // For all authenticated identities, enumerate claims, evaluate against
+                // rules for any matches.
+                bool ruleResult = claimsId?.Any(id =>
+                    rules.Any(r => {
+                        var evaluation = r.EvaluateRules(id);
+                        if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
+
+                        return evaluation;
+                    }))
+                    ?? false;
+                return ruleResult;
+            } else {
+
+                var claimsId = context.User.Identities.Where(i => !i.IsAuthenticated);
+                var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.Authenticated);
+
+                // For all authenticated identities, enumerate claims, evaluate against
+                // rules for any matches.
+                bool ruleResult = claimsId?.Any(id =>
+                    rules.Any(r => {
+                        var evaluation = r.EvaluateRules(id);
+                        if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
+
+                        return evaluation;
+                    }))
+                    ?? false;
+                return ruleResult;
             }
-
-            return false;
         }
 
-        private bool EvalateRulesOnClaims(AuthorizationHandlerContext context, string route, string action) {
-            // Enumerate claims and evaluate rules on each one. Find any that match.
-            var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
-            var rules = _rules.Policies(route, action)?.Where(x => x is ClaimRulePolicy);
-
-            var result =  claimsId?.Any(id => { // For all authenticated identities
-                return rules?.Any(x => x.EvaluateRules(id.Claims)) ?? false;
-            }) ?? false;
-
-            return result;
-        }
     }
 }

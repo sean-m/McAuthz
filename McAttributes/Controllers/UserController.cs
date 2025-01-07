@@ -15,7 +15,6 @@ namespace McAttributes.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    [McAuthorize]
     public class UserController : ODataController {
 
         ILogger _logger;

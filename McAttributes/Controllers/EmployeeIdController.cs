@@ -18,7 +18,7 @@ namespace McAttributes.Controllers
         private ILogger _logger;
         private DbContext _ctx;
         private readonly DbSet<EmployeeIdRecord> _employeeIds;
-        public EmployeeIdController(ILogger<UserController> logger, IdDbContext dbContext)
+        public EmployeeIdController(ILogger<EmployeeIdController> logger, IdDbContext dbContext)
         {
             _logger = logger;
             _ctx = dbContext;
@@ -36,7 +36,7 @@ namespace McAttributes.Controllers
         // GET api/<EmployeeIdController>/5
         [HttpGet("{id}")]
         [EnableQuery]
-        public IQueryable<EmployeeIdRecord> Get(string id) 
+        public IQueryable<EmployeeIdRecord> Get(string id)
             => from eid in _employeeIds
             where (eid.CloudSourceAnchor.Equals(id, StringComparison.CurrentCultureIgnoreCase))
             || eid.UserPrincipalName.Equals(id, StringComparison.CurrentCultureIgnoreCase)

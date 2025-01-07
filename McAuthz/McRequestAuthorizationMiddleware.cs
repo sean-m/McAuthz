@@ -10,28 +10,28 @@ namespace McAuthz {
         private readonly ILogger _logger;
         private readonly PolicyRequestMapper _mapper;
 
-        public McAuthorizationMiddleware(RequestDelegate next, PolicyRequestMapper mapper)
+        public McAuthorizationMiddleware(RequestDelegate next, PolicyRequestMapper mapper, ILogger<McAuthorizationMiddleware> logger)
         {
             _next = next;
-            //_logger = logger;
+            _logger = logger;
             _mapper = mapper;
         }
 
         public async Task Invoke(HttpContext context) {
 
-            if (_logger != null) _logger.LogInformation($"RequestAuthorizationPolicy middleware invoked");
+            if (_logger != null) _logger.LogDebug($"RequestAuthorizationPolicy middleware invoked");
 
             if (!_mapper.IsAuthorized(context)) {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return;
+                // TODO FIXME this breaks middleware evaluation, figure out how to get not-authorized to propagate, maybe it's an ordering issue?
+                //return;
             }
 
             await _next(context);
         }
 
         public async Task Run(HttpContext context) {
-
-            if (_logger != null) _logger.LogInformation($"RequestAuthorizationPolicy middleware ran");
+            if (_logger != null) _logger.LogDebug($"RequestAuthorizationPolicy middleware ran");
 
 
             await _next(context);

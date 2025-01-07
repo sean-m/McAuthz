@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Requirements\RequirementInterface.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="McRule" Version="0.4.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
