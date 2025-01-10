@@ -28,7 +28,7 @@ namespace McAuthz.Tests {
             var claims = new List<Claim>();
             var me = new Claim("name", "Sean McArdle");
             claims.Add(me);
-            bool result = matchSean.EvaluatePrincipal(claims);
+            bool result = matchSean.EvaluatePrincipal(claims).Succes;
             Assert.IsTrue(result);
         }
 
@@ -38,13 +38,13 @@ namespace McAuthz.Tests {
             var me = new Claim("name", "Sean McArdle");
             claims.Add(me);
 
-            Assert.IsFalse(matchNotSean.EvaluatePrincipal(claims));
+            Assert.IsFalse(matchNotSean.EvaluatePrincipal(claims).Succes);
 
             claims.Clear();
             var notme = new Claim("name", "Robin Williams");
             claims.Add(notme);
 
-            Assert.IsTrue(matchNotSean.EvaluatePrincipal(claims));
+            Assert.IsTrue(matchNotSean.EvaluatePrincipal(claims).Succes);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace McAuthz.Tests {
             object me = new Claim("name", "Sean McArdle");
 
             var result = matchSean.EvaluatePrincipal( me );
-            Assert.IsTrue(result, msg);
+            Assert.IsTrue(result.Succes, msg);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace McAuthz.Tests {
             var msg = "Uninitialized rules shouldn't throw.";
             var me = new Claim("name", "Sean McArdle");
             Assert.DoesNotThrow(() => uninitialized.EvaluatePrincipal(me), msg);
-            Assert.IsFalse(uninitialized.EvaluatePrincipal(me), msg);
+            Assert.IsFalse(uninitialized.EvaluatePrincipal(me).Succes, msg);
         }
     }
 }
