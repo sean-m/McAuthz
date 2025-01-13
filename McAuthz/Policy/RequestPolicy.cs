@@ -19,16 +19,12 @@ namespace McAuthz.Policy {
         #region properties
 
         public new string TargetType {
-            get => base.TargetType ?? "ClaimSet";
-            set {
-                if (base.TargetType == null) { base.TargetType = value; } else { _ = value; }
-            }
-        }
+            get; set;
+        } = "ClaimSet";
 
         public IEnumerable<ClaimRequirement> ClaimRequirements { get => Requirements.Where(r => r is ClaimRequirement).Cast<ClaimRequirement>(); }
         public IEnumerable<ClaimExpression> ClaimExpressions { get => Requirements.Where(r => r is ClaimExpression).Cast<ClaimExpression>(); }
         public IEnumerable<RoleRequirement> RoleRequirements { get => Requirements.Where(r => r is RoleRequirement).Cast<RoleRequirement>(); }
-        public IEnumerable<ExpressionRequirement> ExpressionRequirements { get => Requirements.Where(x => x is ExpressionRequirement).Cast<ExpressionRequirement>(); }
 
         #endregion  // properties
 
@@ -40,7 +36,7 @@ namespace McAuthz.Policy {
         public RequestPolicy(IEnumerable<Requirement> Requirements) {
             init();
 
-            this.Requirements.AddRange(Requirements);
+            ((List<Requirement>)this.Requirements).AddRange(Requirements);
         }
 
         private void init() {
@@ -86,10 +82,10 @@ namespace McAuthz.Policy {
             return result;
         }
 
-        #region InspectPrincipal
+        #region inspectPrincipal
 
-        public new bool EvaluatePrincipal(ClaimsPrincipal principal) {
-            var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.ClaimName, x.ClaimValue)) : true;
+        private  bool EvaluatePrincipal(ClaimsPrincipal principal) {
+            var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.GetPredicate())) : true;
 
             var claimExprEval = true;
 
@@ -98,8 +94,8 @@ namespace McAuthz.Policy {
             return claimEval && claimExprEval && roleEval;
         }
 
-        public bool EvaluatePrincipal(ClaimsIdentity principal) {
-            var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.ClaimName, x.ClaimValue)) : true;
+        private bool EvaluatePrincipal(ClaimsIdentity principal) {
+            var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.GetPredicate())) : true;
 
             var claimExprEval = true;
 
@@ -107,17 +103,6 @@ namespace McAuthz.Policy {
             var roleEval = RoleRequirements.Count() > 0 ? RoleRequirements.All(x => principal.HasClaim(roleClaimeType, x.RoleName)) : true;
 
             return claimEval && claimExprEval && roleEval;
-        }
-
-        public bool EvaluatePrincipal(dynamic inputs) {
-            if (inputs == null) return false;
-
-            if (inputs is ClaimsIdentity ci) return EvaluatePrincipal(ci);
-            if (inputs is ClaimsPrincipal cp) return EvaluatePrincipal(cp);
-            if (inputs is IEnumerable<Claim> lc) return EvaluateListOfClaims(lc.ToList());
-            if (inputs is Claim c) return EvaluateOnClaim(c);
-
-            throw new NotImplementedException($"Not implemented for input type:{inputs?.GetType().Name}");
         }
 
         private bool EvaluateOnClaim(Claim claim) {
@@ -133,25 +118,32 @@ namespace McAuthz.Policy {
             return claimEval;
         }
 
-        #endregion  // InspectPrincipal
-
-        #region InspectBody
-
-        public bool EvaluateBody(dynamic inputs) {
-            var expressions = ExpressionRequirements;
-
-            if (expressions.Count() == 0) return false;
-
-            foreach (var er in expressions) {
-                var expr = er.GetValue();
-                if (inputs) return true;
+        public override McAuthorizationResult EvaluatePrincipal(dynamic inputs) {
+            var evaluateSucces = new McAuthorizationResult {
+                Succes = false
+            };
+            if (inputs == null) {
+                evaluateSucces.FailureReason = "Principal cannot be null";
+                return evaluateSucces;
             }
 
-            return false;
+            try {
+                evaluateSucces.Succes = inputs switch {
+                    ClaimsIdentity ci => EvaluatePrincipal(ci),
+                    ClaimsPrincipal cp => EvaluatePrincipal(cp),
+                    IEnumerable<Claim> lc => EvaluateListOfClaims(lc.ToList()),
+                    Claim c => EvaluateOnClaim(c),
+                    _ => throw new NotImplementedException($"Not implemented for input type:{inputs?.GetType().Name}"),
+                };
+            } catch (Exception e) {
+                evaluateSucces.Exception = e;
+                evaluateSucces.FailureReason = e.ToString();
+            }
+
+            return evaluateSucces;
         }
 
-        #endregion // InspectBody
-
+        #endregion  // inspectPrincipal
 
         #endregion  // methods
 

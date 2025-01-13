@@ -18,23 +18,21 @@ namespace McAuthz.Policy {
         public string Route { get; set; }
         public string Action { get; set; }
         public AuthenticationStatus Authentication { get; set; } = AuthenticationStatus.Authenticated;
-        public List<Requirement> Requirements { get; set; } = new List<Requirement>();
+        public IEnumerable<Requirement> Requirements { get; set; } = new List<Requirement>();
 
+        public IEnumerable<string?> Keys() {
+            return Requirements.Select(r => r.Key);
+        }
 
         public Guid Id => throw new NotImplementedException();
 
-        public virtual bool EvaluateBody(dynamic inputs) {
-            return false;
+        public virtual McAuthorizationResult EvaluateModel(dynamic inputs) {
+            return new McAuthorizationResult { Succes = false };
         }
 
-        public virtual bool EvaluatePrincipal(dynamic inputs) {
-            return false;
+        public virtual McAuthorizationResult EvaluatePrincipal(dynamic inputs) {
+            return new McAuthorizationResult { Succes = false };
         }
-
-        public virtual bool EvaluatePrincipal(ClaimsPrincipal inputs) {
-            return false;
-        }
-
         public new string ToString() => $"{Name} [{TargetType}] => {Action?.ToUpper()} {Route}";
     }
 }

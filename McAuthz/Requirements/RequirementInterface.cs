@@ -4,7 +4,6 @@ using System.Text;
 
 namespace McAuthz.Requirements {
     public interface Requirement {
-        public Type ValueType { get; }
-        public object GetValue();
+        public string? Key { get; }
     }
 }

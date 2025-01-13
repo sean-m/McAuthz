@@ -1,4 +1,5 @@
 ﻿using McAuthz.Interfaces;
+using McAuthz.Requirements;
 using McRule;
 using System;
 using System.Collections.Generic;
@@ -9,57 +10,74 @@ using System.Text;
 
 namespace McAuthz.Policy
 {
-    public class ResourceRulePolicy : RulePolicyBase { }
+    public class ResourceRulePolicy : RequestPolicy, RulePolicy {
 
-    //public class ResourceRulePolicy<T> : ResourceRulePolicy, RulePolicy {
+        #region properties
 
-    //    public new string TargetType { get => typeof(T).Name; set => _ = value; }
+        #endregion  // properties
 
-    //    #region constructors
+        #region constructors
 
-    //    public ResourceRulePolicy () { }
+        public ResourceRulePolicy() {  }
 
-    //    public ResourceRulePolicy (IEnumerable<(string, string)> ResourceMatches) {
-    //        foreach (var m in ResourceMatches) {
-    //            Rules.Add(new ExpressionRule(TargetType, m.Item1, m.Item2));
-    //        }
-    //    }
+        public ResourceRulePolicy(IEnumerable<Requirement> Requirements) : base(Requirements) {
 
-    //    #endregion  constructors
+        }
 
-    //    #region methods
+        #endregion  // constructors
 
-    //    private Func<T, bool>? _rule;
-    //    private string? _ruleString;
-    //    public bool ResourceRuleMatches(dynamic Resource) {
-    //        if (_rule == null) {
-    //            var ruleExpression = GetExpression<T>();
-    //            _ruleString = ruleExpression?.ToString();
-    //            _rule = ruleExpression?.Compile();
-    //        }
-    //        if (_rule == null) return false;
+        #region methods
 
-    //        var policyResult = _rule.Invoke((T)Resource);
+        private bool EvaluateModelList(IEnumerable<dynamic> models) {
+            return models.All(x => MatchesRules(x));
+        }
 
-    //        System.Diagnostics.Trace.WriteLineIf(!string.IsNullOrEmpty(_ruleString), $"Policy rule '{_ruleString}' evaluated: {policyResult}");
+        private bool MatchesRules(dynamic model) {
+            IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
+            return requirements.All(rule => {
+                if (model is Dictionary<string, string> dict) {
+                    var func = rule.GetDictionaryFunc();
+                    var result = func(dict);
+                    return result;
+                } else {
+                    throw new NotImplementedException();
+                }
+            });
 
-    //        return policyResult;
-    //    }
+            return false;
+        }
 
-    //    #region RulePolicyInterface
+        public override McAuthorizationResult EvaluateModel(dynamic inputs) {
+            var result = new McAuthorizationResult { Succes=false };
 
-    //    public bool EvaluateRules(dynamic inputs) {
-    //        if (inputs is T input) {
-    //            return ResourceRuleMatches(input);
-    //        }
-    //        return false;
-    //    }
+            if (inputs is IEnumerable<dynamic> enumerable) {
+                result.Succes = EvaluateModelList(enumerable);
+            }
 
-    //    public bool EvaluateRules(IEnumerable<dynamic> inputs) {
-    //        return inputs.Where(x => x is T)?.Cast<T>()?.Any(x => ResourceRuleMatches(x)) ?? false;
-    //    }
+            result.Succes = MatchesRules(inputs);
 
-    //    #endregion  RulePolicyInterface
-    //    #endregion  methods
-    //}
+            return result;
+        }
+
+        #endregion  // methods
+    }
+
+    public class ResourceRulePolicy<T> : ResourceRulePolicy, RulePolicy {
+
+        public new string TargetType { get => typeof(T).Name; set => _ = value; }
+
+        #region constructors
+
+        public ResourceRulePolicy() { }
+
+        public ResourceRulePolicy(IEnumerable<(string, string)> ResourceMatches) {
+
+        }
+
+        #endregion  constructors
+
+        #region methods
+
+        #endregion  methods
+    }
 }

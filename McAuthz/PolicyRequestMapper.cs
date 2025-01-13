@@ -41,9 +41,9 @@ namespace McAuthz
                 principalRuleResult = claimsId?.Any(id =>
                     rules.Any(r => {
                         var evaluation = r.EvaluatePrincipal(id);
-                        if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: '{r.Name}'. {action} {path}");
+                        if (evaluation.Succes) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: '{r.Name}'. {action} {path}");
 
-                        return evaluation;
+                        return evaluation.Succes;
                     }))
                     ?? false;
 
@@ -52,6 +52,7 @@ namespace McAuthz
                     logger?.LogDebug($"Allow Authenticated RulePolicy: {{'Name':'Allow Authenticated {action.ToUpper()} to {path}','Route':'{path}','Action':'{action}','Authentication':'Authenticated'}}");
                 }
             } else {
+                logger?.LogDebug("User is unauthenticated!");
 
                 var claimsId = context.User.Identities.Where(i => !i.IsAuthenticated);
                 var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.Authenticated);
@@ -61,9 +62,9 @@ namespace McAuthz
                 principalRuleResult = claimsId?.Any(id =>
                     rules.Any(r => {
                         var evaluation = r.EvaluatePrincipal(id);
-                        if (evaluation) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
+                        if (evaluation.Succes) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: {r.Name}");
 
-                        return evaluation;
+                        return evaluation.Succes;
                     }))
                     ?? false;
 
@@ -74,14 +75,8 @@ namespace McAuthz
 
             if (!principalRuleResult) logger?.LogDebug($"Allow Any RulePolicy: {{'Route':'{path}','Action':'{action}','Authentication':'Any'}}");
 
-            bool bodyRuleResult = true;
-            if (principalRuleResult) {
 
-
-            }
-            bodyEnd:
-
-            return principalRuleResult && bodyRuleResult;
+            return principalRuleResult;
         }
     }
 }

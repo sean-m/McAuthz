@@ -23,7 +23,6 @@ namespace McAuthz {
 
             if (!_mapper.IsAuthorized(context)) {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                // TODO FIXME this breaks middleware evaluation, figure out how to get not-authorized to propagate, maybe it's an ordering issue?
                 return;
             }
 

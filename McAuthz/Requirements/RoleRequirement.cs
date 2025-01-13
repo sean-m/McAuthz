@@ -12,12 +12,8 @@ namespace McAuthz.Requirements {
 
         public string RoleName { get; set; }
 
+        public string Key { get => RoleName; }
+
         public Type ValueType => throw new NotImplementedException();
-
-        public string GetValue() => RoleName?.Trim();
-
-        object Requirement.GetValue() {
-            return GetValue();
-        }
     }
 }

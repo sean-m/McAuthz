@@ -1,4 +1,6 @@
-﻿using McRule;
+﻿using McAuthz.Requirements;
+using McRule;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -11,8 +13,10 @@ namespace McAuthz.Interfaces {
         public string Route { get; set; }
         public string Action { get; set; }
         public AuthenticationStatus Authentication { get; set; }
+        public IEnumerable<Requirement> Requirements { get; set; }
 
-        bool EvaluatePrincipal(dynamic inputs);
-        bool EvaluateBody(dynamic inputs);
+        public IEnumerable<string?> Keys();
+        McAuthorizationResult EvaluatePrincipal(dynamic inputs);
+        McAuthorizationResult EvaluateModel(dynamic inputs);
     }
 }
