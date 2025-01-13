@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace McAuthz.Requirements {
+#if DEBUG
     public class ClaimExpression : ClaimRequirement {
         public new Type ValueType { get => typeof(Func<string, bool>); }
 
+        public ClaimExpression() {
+
+
+        }
 
         private Dictionary<Type, dynamic> _expressionCache = new Dictionary<Type, dynamic>();
         public Func<T, bool> GetValue<T> () {
@@ -20,4 +25,5 @@ namespace McAuthz.Requirements {
             return expr.Compile();
         }
     }
+#endif
 }

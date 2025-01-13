@@ -8,7 +8,12 @@ using McRule;
 using Newtonsoft.Json;
 
 namespace McAuthz.Requirements {
+#if DEBUG
     public class ExpressionRequirement : Requirement {
+        public ExpressionRequirement() {
+
+        }
+
         public string ExpressionJson { get; set; }
         public string InputType { get; set; }
         public Type ValueType => throw new NotImplementedException();
@@ -24,4 +29,5 @@ namespace McAuthz.Requirements {
             return expression?.Compile() ?? PredicateBuilder.False<dynamic>().Compile();
         }
     }
+#endif
 }
