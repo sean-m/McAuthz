@@ -1,10 +1,12 @@
 ﻿using McAuthz.Interfaces;
 using McAuthz.Requirements;
 using McRule;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -40,7 +42,14 @@ namespace McAuthz.Policy
                     var result = func(dict);
                     return result;
                 } else {
-                    throw new NotImplementedException();
+                    Type type = typeof(PropertyRequirement);
+                    Type modelType = model.GetType();
+                    MethodInfo method = type.GetMethod("GetPropertyFunc", BindingFlags.Public | BindingFlags.Instance);
+                    MethodInfo genericMethod = method.MakeGenericMethod(modelType);
+                    Func<dynamic, bool> func = (Func<dynamic, bool>)genericMethod.Invoke(rule, new object[] { });
+
+                    var result = func(model);
+                    return result;
                 }
             });
 

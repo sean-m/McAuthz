@@ -129,8 +129,33 @@ namespace McAuthz
                 var caseInsensitive = new Dictionary<string, string>(dict, StringComparer.CurrentCultureIgnoreCase);
                 modelAuthorized = EvaluateDictionary(caseInsensitive, typeName, effectivePolicies);
             }
+            else {
+                modelAuthorized = EvaluateModel(model, typeName, effectivePolicies);
+            }
 
             return (modelAuthorized, string.Empty);
+        }
+
+        private bool EvaluateModel(dynamic model, string typeName, IEnumerable<RulePolicy> effectivePolicies) {
+            var requiredProperties
+                = effectivePolicies.SelectMany(x => x.Keys());
+            if (requiredProperties.Count() == 0) {
+                logger?.LogWarning($"No policies resolved for type: '{typeName}'!");
+                return false;
+            }
+
+            var results = effectivePolicies.Select(policy => new { policy = policy, result = policy.EvaluateModel(model) }).ToList();
+
+            // Log out results of policy evaluation
+            results.ForEach(p => {
+                if (p.result.Succes) {
+                    logger?.LogDebug($"Policy {p.policy.ToString()} {p.result.ToString()}");
+                } else {
+                    logger?.LogInformation($"Policy {p.policy.ToString()} {p.result.ToString()}");
+                }
+            });
+
+            return results.All(r => r.result.Succes);
         }
 
         private bool EvaluateDictionary(Dictionary<string,string> model, string typeName, IEnumerable<RulePolicy> effectivePolicies) {
