@@ -83,14 +83,17 @@ var ruleProvider = new RuleProvider();
 
 builder.Services.AddSingleton<RuleProviderInterface>(ruleProvider);
 builder.Services.AddSingleton<PolicyRequestMapper>();
-
-//builder.Services.AddAuthorization(options => {
-//    options.AddPolicy(
-//        Globals.McPolicy,
-//        policyBuilder => policyBuilder.AddRequirements(
-//            new RequireMcRuleApproved(ruleProvider))
-//    );
-//});
+// This is used for resource authorization rules. That is policies that inspect the resources which are handled in the controller.
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy(
+        Globals.McPolicy,
+        policyBuilder => policyBuilder.Requirements.Add(
+            new RequireMcRuleApproved(ruleProvider))
+    );
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
 
 
@@ -145,8 +148,8 @@ app.UseAuthentication();
 app.MapControllers();
 app.UseRouting();
 
-app.UseMcAuthorization();
 app.UseAuthorization();
+app.UseMcAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
@@ -163,47 +166,131 @@ public class RuleProvider : RuleProviderInterface {
 
     private ILogger<RuleProvider>? logger;
 
-    public RuleProvider() { }
+    public RuleProvider() { initResourcePolicies(); }
     public RuleProvider(ILogger<RuleProvider> Logger) {
         logger = Logger;
+        initResourcePolicies();
     }
 
-    internal IEnumerable<RulePolicy> ClaimRulesCollection { get; set; } = new List<RulePolicy> {
+    internal IEnumerable<RulePolicy> RequestPolicies { get; set; } = new List<RulePolicy> {
         new RequestPolicy(
             new Requirement[] {
                 new ClaimRequirement ("name", "Sean McArdle"),
-                new RoleRequirement ("Admin")
+                new RoleRequirement ("Admin"),
             }) {
             Name = "Sean with Admin role",
             Route = "/odata/User",
             Action = "GET"
         },
-        new RequestPolicy(
-            new Requirement[] {}) {
+        new RequestPolicy() {
             Name = "All users can access the home page",
             Route = "/",
             Action = "GET",
             Authentication = AuthenticationStatus.Any
         },
+        new RequestPolicy() {
+            Name = "All users can access shared www resources",
+            Route = "/Shared/*",
+            Action = "GET",
+            Authentication = AuthenticationStatus.Any
+        },
+        new RequestPolicy() {
+            Name = "All users access /MicrosoftIdentity/*",
+            Route = "/MicrosoftIdentity/*",
+            Action = "*",
+            Authentication = AuthenticationStatus.Any
+        },
+        RequestPolicy.FromJson("{'Name':'Allow authenticated to Stargate','Route':'/odata/Stargate','Action':'GET','Authentication':'Authenticated'}"),
+        new RequestPolicy(
+            new Requirement[] {
+                new ClaimRequirement ("name", "Sean McArdle"),
+                new RoleRequirement ("Admin")
+            }) {
+            Name = "Say: Sean with Admin role",
+            Route = "/*/Say",
+            Action = "GET"
+        },
+        new RequestPolicy(
+            new Requirement[] {
+                new ClaimRequirement ("name", "Sean McArdle"),
+                new RoleRequirement ("Admin")
+            }) {
+            Name = "Say: Sean with Admin role",
+            Route = "/*/Say*",
+            Action = "P*T"
+        },
     };
 
-    internal Dictionary<Type, IEnumerable<RulePolicy>> ResourcePolicies { get; set; } = new Dictionary<Type, IEnumerable<RulePolicy>>();
+    internal Dictionary<string, List<RulePolicy>> ResourcePolicies { get; set; } = new Dictionary<string, List<RulePolicy>>(
+        StringComparer.CurrentCultureIgnoreCase);
+
+    private IEnumerable<ResourceRulePolicy> _policies { get; set; } = new[] {
+        new ResourceRulePolicy()
+        {
+            Requirements = new Requirement[] {
+                new PropertyRequirement ("name", "John Doe"),
+                new PropertyRequirement ("topic", "Office News"),
+            },
+            Name = "KV Gossip allowed for John Doe",
+            TargetType = "Gossip"
+        },
+    };
+
+
+    void initResourcePolicies() {
+        foreach (var r in _policies) {
+            if (!ResourcePolicies.ContainsKey(r.TargetType)) {
+                ResourcePolicies.Add(r.TargetType, new List<RulePolicy>());
+            }
+
+            ResourcePolicies[r.TargetType].Add(r);
+        }
+    }
 
     public IEnumerable<RulePolicy> Policies(string route, string method="GET") {
         logger?.LogInformation($"Getting claim policies for /{route} {method}");
-        return ClaimRulesCollection.Where(x =>
-            x.Route == "*"
-            || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase)
-                && x.Action.Equals(method, StringComparison.CurrentCultureIgnoreCase));
+        return RequestPolicies.Where(x => route.Like(x.Route)
+                && method.Like(x.Action));
     }
 
-    public IEnumerable<RulePolicy> Policies(Type type) {
+    public IEnumerable<RulePolicy> Policies(string type) {
         if (ResourcePolicies.ContainsKey(type)) {
-            logger?.LogInformation($"Getting type policies for {type.Name}");
+            logger?.LogInformation($"Getting type policies for {type}");
             return ResourcePolicies[type];
         }
 
-        logger?.LogWarning($"No policies for type:{type.Name}, returning empty set!");
+        logger?.LogWarning($"No policies for type:{type}, returning empty set!");
         return Array.Empty<RulePolicy>();
+    }
+}
+public static class DictionaryExtensions {
+    public static void Upsert(this Dictionary<string, string> dict, string key, string value) {
+        if (string.IsNullOrEmpty(key)) return;
+
+        if (dict.ContainsKey(key)) {
+            dict[key] = value;
+        } else {
+            dict.Add(key, value);
+        }
+    }
+
+    public static void Upsert<T>(this Dictionary<string, T> dict, string key, T value) {
+        if (string.IsNullOrEmpty(key)) return;
+
+        if (dict.ContainsKey(key)) {
+            dict[key] = value;
+        } else {
+            dict.Add(key, value);
+        }
+    }
+
+    public static void Upsert<T>(this Dictionary<string, List<T>> dict, string key, T value) {
+        if (string.IsNullOrEmpty(key)) return;
+
+        if (dict.ContainsKey(key)) {
+            dict[key].Add(value);
+        } else {
+            dict.Add(key, new List<T> { value });
+        }
     }
 }

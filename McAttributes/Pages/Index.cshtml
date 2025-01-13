@@ -6,171 +6,238 @@
 
 <div id="app" class="container">
 
-<div>
-    <!-- Tabs -->
     <div>
-        <ul class="nav nav-tabs" id="navTabs" role="tablist">
-             <li class="nav-item"   role="tab">
-                <a :class="currentTab === 'userForm' ? 'nav-link active' : 'nav-link'" @@click="this.currentTab = 'userForm'" id="user-tab" data-bs-toggle="tab" href="#userForm" aria-current="page" aria-controls="Users" aria-selected="true">User Search</a>
-            </li>
+        <!-- Tabs -->
+        <div>
+            <ul class="nav nav-tabs" id="navTabs" role="tablist">
+                <li class="nav-item" role="tab">
+                    <a :class="currentTab === 'userForm' ? 'nav-link active' : 'nav-link'" @@click="this.currentTab = 'userForm'" id="user-tab" data-bs-toggle="tab" href="#userForm" aria-current="page" aria-controls="Users" aria-selected="true">User Search</a>
+                </li>
 
-            <li class="nav-item"  role="tab">
-                <a :class="currentTab === 'issueForm' ? 'nav-link active' : 'nav-link'" @@click="this.currentTab = 'issueForm'" id="issue-tab" data-bs-toggle="tab" href="#issueForm" aria-controls="Identity Issues" aria-selected="false">Identity Issues</a>
-            </li>
+                <li class="nav-item" role="tab">
+                    <a :class="currentTab === 'issueForm' ? 'nav-link active' : 'nav-link'" @@click="this.currentTab = 'issueForm'" id="issue-tab" data-bs-toggle="tab" href="#issueForm" aria-controls="Identity Issues" aria-selected="false">Identity Issues</a>
+                </li>
 
-            <li class="nav-item"  role="tab">
-                <a :class="currentTab === 'stargateForm' ? 'nav-link active' : 'nav-link'" @@click="this.currentTab = 'stargateForm'" id="issue-tab" data-bs-toggle="tab" href="#stargateForm" aria-controls="Stargate" aria-selected="false">Stargate</a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Tab Content -->
-    <div id="myTabContent" class="tab-content">
-
-        <!-- User Search -->
-        <div id="userForm" :class="currentTab === 'userForm' ? 'tab-pane active' : 'tab-pane'" role="tabpanel" aria-labelledby="user-tab">
-            <!-- User search input field -->
-            <div class="input-group mb-3">
-                <input class="form-control" type="text" placeholder="search" name="search-input" v-on:keyup.enter="searchForUsers()" v-model="currentUserSearch.searchTerm" />
-                <button class="button input-group-text" @@click="searchForUsers()">Search</button>
-            </div>
-
-            <!-- Search configuration options: pagination, result page size, clear button -->
-            <div>
-                <label class="preference" for="paginatePreference">Paginate results</label>
-                <input id="paginatePreference" type="checkbox" name="paginatePreference" v-model="currentUserSearch.paginate" />
-            </div>
-            <div>
-                <label class="preference" for="pageSize">Result size</label>
-                <input id="pageSize" type="number" name="pageSize" v-model="currentUserSearch.pageSize" />
-            </div>
-            <div>
-                <label v-if="currentUserSearch.resultCount">Total Results: {{currentUserSearch.resultCount}}</label>
-                <br />
-                <label v-if="currentUserSearch.results">Results Fetched: {{currentUserSearch.results.length}}</label>
-            </div>
-            <div>
-                <button v-if="currentUserSearch.resultCount > 0" class="btn btn-outline-warning" @@click="currentUserSearch.clearResults()">Clear Results</button>
-            </div>
-            
-            <!-- User search results -->
-            <button class="btn btn-link" id="btnLoadMore" v-if="currentUserSearch.resultCount > currentUserSearch.results.length" @@click="loadMoreUserResults()">Load More</button>
-
-            <table class="table">
-                <tr>
-                    <th v-if="currentUserSearch.resultCount > 0">Issues</th><th v-for="(value, key, i) in currentUserSearch.results[0]">{{ expandOnCase(key) }}</td>
-                </tr>
-                <tr v-for="value of currentUserSearch.results">
-                    <td><button class="btn btn-outline-secondary" v-if="value.EmployeeId" @@click="this.showIssuesForUser(value.EmployeeId)">{{value.EmployeeId}}</button></td><td v-for="(val, key, i) in value">{{ val }}</td>
-                </tr>
-            </table>
-
-            <button class="btn btn-link" id="btnLoadMore" v-if="currentUserSearch.resultCount > currentUserSearch.results.length" @@click="currentUserSearch.loadNextSet()">Load More</button>
+                <li class="nav-item" role="tab">
+                    <a :class="currentTab === 'stargateForm' ? 'nav-link active' : 'nav-link'" @@click="this.currentTab = 'stargateForm'" id="issue-tab" data-bs-toggle="tab" href="#stargateForm" aria-controls="Stargate" aria-selected="false">Stargate</a>
+                </li>
+            </ul>
         </div>
 
-        <!-- Issue Search -->
-        <div id="issueForm" :class="currentTab === 'issueForm' ? 'tab-pane active' : 'tab-pane'" role="tabpanel" aria-labelledby="issue-tab">
-            
-            <!-- Issue search input field -->
-            <div class="input-group mb-3">
-                <input class="form-control" type="text" placeholder="search" name="search-input" v-on:keyup.enter="searchForIssues()" v-model="currentIssueSearch.searchTerm" />
-                <button class="button input-group-text" @@click="searchForIssues()">Search</button>
+        <!-- Tab Content -->
+        <div id="myTabContent" class="tab-content">
+
+            <!-- User Search -->
+            <div id="userForm" :class="currentTab === 'userForm' ? 'tab-pane active' : 'tab-pane'" role="tabpanel" aria-labelledby="user-tab">
+                <select id="callType" type="text">
+                    <option>POST</option>
+                    <option>PUT</option>
+                </select>
+
+                <button onclick="PostIt()">Do The Thing</button>
+                <button onclick="PostItKV('John Doe')">Key-Value John Doe</button>
+                <button onclick="PostItKV('Jane Doe')">Key-Value Jane Doe</button>
+                <button onclick="PostItKVNull()">Key-Value NULL</button>
+                <input id="messageTopic" type="text" />
+
+                <div>
+                <textarea id="result"></textarea>
+                </div>
+
+                <!-- User search input field -->
+                <div class="input-group mb-3">
+                    <input class="form-control" type="text" placeholder="search" name="search-input" v-on:keyup.enter="searchForUsers()" v-model="currentUserSearch.searchTerm" />
+                    <button class="button input-group-text" @@click="searchForUsers()">Search</button>
+                </div>
+
+                <!-- Search configuration options: pagination, result page size, clear button -->
+                <div>
+                    <label class="preference" for="paginatePreference">Paginate results</label>
+                    <input id="paginatePreference" type="checkbox" name="paginatePreference" v-model="currentUserSearch.paginate" />
+                </div>
+                <div>
+                    <label class="preference" for="pageSize">Result size</label>
+                    <input id="pageSize" type="number" name="pageSize" v-model="currentUserSearch.pageSize" />
+                </div>
+                <div>
+                    <label v-if="currentUserSearch.resultCount">Total Results: {{currentUserSearch.resultCount}}</label>
+                    <br />
+                    <label v-if="currentUserSearch.results">Results Fetched: {{currentUserSearch.results.length}}</label>
+                </div>
+                <div>
+                    <button v-if="currentUserSearch.resultCount > 0" class="btn btn-outline-warning" @@click="currentUserSearch.clearResults()">Clear Results</button>
+                </div>
+
+                <!-- User search results -->
+                <button class="btn btn-link" id="btnLoadMore" v-if="currentUserSearch.resultCount > currentUserSearch.results.length" @@click="loadMoreUserResults()">Load More</button>
+
+                <table class="table">
+                    <tr>
+                        <th v-if="currentUserSearch.resultCount > 0">Issues</th>
+                        <th v-for="(value, key, i) in currentUserSearch.results[0]">{{ expandOnCase(key) }}</td>
+                    </tr>
+                    <tr v-for="value of currentUserSearch.results">
+                        <td><button class="btn btn-outline-secondary" v-if="value.EmployeeId" @@click="this.showIssuesForUser(value.EmployeeId)">{{value.EmployeeId}}</button></td>
+                        <td v-for="(val, key, i) in value">{{ val }}</td>
+                    </tr>
+                </table>
+
+                <button class="btn btn-link" id="btnLoadMore" v-if="currentUserSearch.resultCount > currentUserSearch.results.length" @@click="currentUserSearch.loadNextSet()">Load More</button>
             </div>
 
-            <!-- Search configuration options: pagination, result page size, clear button -->
-            <div>
-                <label class="preference" for="paginatePreference">Paginate results</label>
-                <input id="paginatePreference" type="checkbox" name="paginatePreference" v-model="currentIssueSearch.paginate" />
-            </div>
-            <div>
-                <label class="preference" for="pageSize">Result size</label>
-                <input id="pageSize" type="number" name="pageSize" v-model="currentIssueSearch.pageSize" />
-            </div>
-            <div>
-                <label v-if="currentIssueSearch.resultCount">Total Results: {{currentIssueSearch.resultCount}}</label>
-                <br />
-                <label v-if="currentIssueSearch.results">Results Fetched: {{currentIssueSearch.results.length}}</label>
-            </div>
-            <div>
-                <button v-if="currentIssueSearch.resultCount > 0" class="btn btn-outline-warning" @@click="currentIssueSearch.clearResults()">Clear Results</button>
-            </div>
-            
-            <!-- User search results -->
-            <button class="btn btn-link" id="btnLoadMore" v-if="currentIssueSearch.resultCount > currentIssueSearch.results.length" @@click="currentIssueSearch.loadNextSet()">Load More</button>
+            <!-- Issue Search -->
+            <div id="issueForm" :class="currentTab === 'issueForm' ? 'tab-pane active' : 'tab-pane'" role="tabpanel" aria-labelledby="issue-tab">
 
-            <table class="table">
-                <tr>
-                    <th v-for="(value, key, i) in currentIssueSearch.results[0]">{{ expandOnCase(key) }}</td>
-                </tr>
-                <tr v-for="value of currentIssueSearch.results">
-                    <td v-for="(val, key, i) in value">{{ val }}</td>
-                </tr>
-            </table>
+                <!-- Issue search input field -->
+                <div class="input-group mb-3">
+                    <input class="form-control" type="text" placeholder="search" name="search-input" v-on:keyup.enter="searchForIssues()" v-model="currentIssueSearch.searchTerm" />
+                    <button class="button input-group-text" @@click="searchForIssues()">Search</button>
+                </div>
 
-            <button class="btn btn-link" id="btnLoadMore" v-if="currentIssueSearch.resultCount > currentIssueSearch.results.length" @@click="currentIssueSearch.loadNextSet()">Load More</button>
-        </div>
+                <!-- Search configuration options: pagination, result page size, clear button -->
+                <div>
+                    <label class="preference" for="paginatePreference">Paginate results</label>
+                    <input id="paginatePreference" type="checkbox" name="paginatePreference" v-model="currentIssueSearch.paginate" />
+                </div>
+                <div>
+                    <label class="preference" for="pageSize">Result size</label>
+                    <input id="pageSize" type="number" name="pageSize" v-model="currentIssueSearch.pageSize" />
+                </div>
+                <div>
+                    <label v-if="currentIssueSearch.resultCount">Total Results: {{currentIssueSearch.resultCount}}</label>
+                    <br />
+                    <label v-if="currentIssueSearch.results">Results Fetched: {{currentIssueSearch.results.length}}</label>
+                </div>
+                <div>
+                    <button v-if="currentIssueSearch.resultCount > 0" class="btn btn-outline-warning" @@click="currentIssueSearch.clearResults()">Clear Results</button>
+                </div>
 
-        <!-- Stargate Search -->
-        <div id="stargateForm" :class="currentTab === 'stargateForm' ? 'tab-pane active' : 'tab-pane'" role="tabpanel" aria-labelledby="user-tab">
-            <!-- User search input field -->
-            <div class="input-group mb-3">
-                <input class="form-control" type="text" placeholder="search" name="search-input" v-on:keyup.enter="searchStargate()" v-model="stargateSearch.searchTerm" />
-                <button class="button input-group-text" @@click="searchStargate()">Search</button>
+                <!-- User search results -->
+                <button class="btn btn-link" id="btnLoadMore" v-if="currentIssueSearch.resultCount > currentIssueSearch.results.length" @@click="currentIssueSearch.loadNextSet()">Load More</button>
+
+                <table class="table">
+                    <tr>
+                        <th v-for="(value, key, i) in currentIssueSearch.results[0]">{{ expandOnCase(key) }}</td>
+                    </tr>
+                    <tr v-for="value of currentIssueSearch.results">
+                        <td v-for="(val, key, i) in value">{{ val }}</td>
+                    </tr>
+                </table>
+
+                <button class="btn btn-link" id="btnLoadMore" v-if="currentIssueSearch.resultCount > currentIssueSearch.results.length" @@click="currentIssueSearch.loadNextSet()">Load More</button>
             </div>
 
-            <div style="display: grid;">
-                <div id="stargateSearch">
+            <!-- Stargate Search -->
+            <div id="stargateForm" :class="currentTab === 'stargateForm' ? 'tab-pane active' : 'tab-pane'" role="tabpanel" aria-labelledby="user-tab">
+                <!-- User search input field -->
+                <div class="input-group mb-3">
+                    <input class="form-control" type="text" placeholder="search" name="search-input" v-on:keyup.enter="searchStargate()" v-model="stargateSearch.searchTerm" />
+                    <button class="button input-group-text" @@click="searchStargate()">Search</button>
+                </div>
+
+                <div style="display: grid;">
+                    <div id="stargateSearch">
+                        <div class="row">
+                            <!-- Search configuration options: pagination, result page size, clear button -->
+                            <div>
+                                <label class="preference" for="paginatePreference">Paginate results</label>
+                                <input id="paginatePreference" type="checkbox" name="paginatePreference" v-model="stargateSearch.paginate" />
+                            </div>
+                            <div>
+                                <label class="preference" for="pageSize">Result size</label>
+                                <input id="pageSize" type="number" name="pageSize" v-model="stargateSearch.pageSize" />
+                            </div>
+                            <div>
+                                <label v-if="stargateSearch.resultCount">Total Results: {{stargateSearch.resultCount}}</label>
+                                <br />
+                                <label v-if="stargateSearch.results">Results Fetched: {{stargateSearch.results.length}}</label>
+                            </div>
+                            <div>
+                                <button v-if="stargateSearch.resultCount > 0" class="btn btn-outline-warning"
+                                        @@click="stargateSearch.clearResults()">
+                                    Clear Results
+                                </button>
+                            </div>
+
+                            <!-- Stargate search results -->
+                            <button class="btn btn-link" id="btnLoadMore" v-if="stargateSearch.resultCount > stargateSearch.results.length"
+                                    @@click="loadMoreStargateResults()">
+                                Load More
+                            </button>
+
+                            <table class="table">
+                                <tr>
+                                    <th>Issues</th>
+                                    <th v-for="(value, key, i) in stargateSearch.results[0]">{{ expandOnCase(key) }}</td>
+                                </tr>
+                                <tr v-for="value of stargateSearch.results">
+                                    <td v-for="(val, key, i) in value">{{ val }}</td>
+                                </tr>
+                            </table>
+
+                            <button class="btn btn-link" id="btnLoadMore" v-if="stargateSearch.resultCount > stargateSearch.results.length"
+                                    @@click="stargateSearch.loadNextSet()">
+                                Load More
+                            </button>
+                        </div>
+
+                    </div>
                     <div class="row">
-                        <!-- Search configuration options: pagination, result page size, clear button -->
-                        <div>
-                            <label class="preference" for="paginatePreference">Paginate results</label>
-                            <input id="paginatePreference" type="checkbox" name="paginatePreference" v-model="stargateSearch.paginate" />
-                        </div>
-                        <div>
-                            <label class="preference" for="pageSize">Result size</label>
-                            <input id="pageSize" type="number" name="pageSize" v-model="stargateSearch.pageSize" />
-                        </div>
-                        <div>
-                            <label v-if="stargateSearch.resultCount">Total Results: {{stargateSearch.resultCount}}</label>
-                            <br />
-                            <label v-if="stargateSearch.results">Results Fetched: {{stargateSearch.results.length}}</label>
-                        </div>
-                        <div>
-                            <button v-if="stargateSearch.resultCount > 0" class="btn btn-outline-warning" 
-                                @@click="stargateSearch.clearResults()">Clear Results</button>
+
+                        <div id="userList" class="col">
+                            <p>Foo</p>
                         </div>
 
-                         <!-- Stargate search results -->
-                        <button class="btn btn-link" id="btnLoadMore" v-if="stargateSearch.resultCount > stargateSearch.results.length" 
-                            @@click="loadMoreStargateResults()">Load More</button>
-
-                        <table class="table">
-                            <tr>
-                                <th>Issues</th><th v-for="(value, key, i) in stargateSearch.results[0]">{{ expandOnCase(key) }}</td>
-                            </tr>
-                            <tr v-for="value of stargateSearch.results">
-                                <td v-for="(val, key, i) in value">{{ val }}</td>
-                            </tr>
-                        </table>
-
-                        <button class="btn btn-link" id="btnLoadMore" v-if="stargateSearch.resultCount > stargateSearch.results.length" 
-                            @@click="stargateSearch.loadNextSet()">Load More</button>
-                    </div>
-
-                    </div>
-                    <div class="row">
-                       
-                    <div id="userList" class="col">
-                        <p>Foo</p>
-                    </div>
-
-                    <div id="userSearch" class="col">
-                        <p>Bar</p>
+                        <div id="userSearch" class="col">
+                            <p>Bar</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
-</div>
+
+<script type="text/javascript">
+    function PostIt() {
+        var choice = document.getElementById("callType").value
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(choice, '/api/Say', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+          "Id": 1,
+          "Name": "John Doe",
+          "Topic": "Office News",
+          "Recipient": "Jane Smith"
+        }));
+    }
+
+    function PostItKV(name) {
+        var choice = document.getElementById("callType").value
+        var topic = document.getElementById("messageTopic").value
+
+        var result = document.getElementById("result")
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(choice, '/api/SayKV', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+          "Id": 1,
+          "Name": name,
+          "Topic": topic,
+          "Recipient": "Jane Smith"
+        }));
+        result.innerText = xhr.responseText;
+    }
+
+    function PostItKVNull() {
+        var choice = document.getElementById("callType").value
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(choice, '/api/SayKV', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(null);
+    }
+</script>
