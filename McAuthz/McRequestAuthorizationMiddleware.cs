@@ -32,7 +32,6 @@ namespace McAuthz {
         public async Task Run(HttpContext context) {
             if (_logger != null) _logger.LogDebug($"RequestAuthorizationPolicy middleware ran");
 
-
             await _next(context);
         }
     }

@@ -116,7 +116,7 @@ namespace McAuthz
 
 
         internal (bool, string) IsAuthorized(AuthorizationHandlerContext context, object model) {
-            bool modelAuthorized = false;
+            (bool, string) modelAuthorized = (false, string.Empty);
 
             // Resolve data type
             if (model == null) return (false, "Value is null.");
@@ -133,15 +133,16 @@ namespace McAuthz
                 modelAuthorized = EvaluateModel(model, typeName, effectivePolicies);
             }
 
-            return (modelAuthorized, string.Empty);
+
+            return modelAuthorized;
         }
 
-        private bool EvaluateModel(dynamic model, string typeName, IEnumerable<RulePolicy> effectivePolicies) {
+        private (bool, string) EvaluateModel(dynamic model, string typeName, IEnumerable<RulePolicy> effectivePolicies) {
             var requiredProperties
                 = effectivePolicies.SelectMany(x => x.Keys());
             if (requiredProperties.Count() == 0) {
                 logger?.LogWarning($"No policies resolved for type: '{typeName}'!");
-                return false;
+                return (false, $"No policies resolved for type: '{typeName}'!");
             }
 
             var results = effectivePolicies.Select(policy => new { policy = policy, result = policy.EvaluateModel(model) }).ToList();
@@ -155,15 +156,20 @@ namespace McAuthz
                 }
             });
 
-            return results.All(r => r.result.Succes);
+            var policyResult = results.All(r => r.result.Succes);
+            string policyMessage = string.Empty;
+            if (!policyResult) {
+                policyMessage = "Denied by policy evaluation.";
+            }
+            return (policyResult, policyMessage);
         }
 
-        private bool EvaluateDictionary(Dictionary<string,string> model, string typeName, IEnumerable<RulePolicy> effectivePolicies) {
+        private (bool, string) EvaluateDictionary(Dictionary<string,string> model, string typeName, IEnumerable<RulePolicy> effectivePolicies) {
             var requiredProperties
                 = effectivePolicies.SelectMany(x => x.Keys());
             if (requiredProperties.Count() == 0) {
                 logger?.LogWarning($"No policies resolved for type: '{typeName}'!");
-                return false;
+                return (false, $"No policies resolved for type: '{typeName}'!");
             }
 
             var results = effectivePolicies.Select(policy => new { policy = policy, result = policy.EvaluateModel(model) }).ToList();
@@ -177,10 +183,15 @@ namespace McAuthz
                 }
             });
 
-            return results.All(r => r.result.Succes);
+            var policyResult = results.All(r => r.result.Succes);
+            string policyMessage = string.Empty;
+            if (!policyResult) {
+                policyMessage = "Denied by policy evaluation.";
+            }
+            return (policyResult, policyMessage);
         }
 
-        private string FigureOutPolicyType(Type type, object model) {
+        internal static string FigureOutPolicyType(Type type, object model) {
             string result = type.Name;
 
             if (result.Like("Dictionary`2")) {
