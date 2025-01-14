@@ -41,12 +41,11 @@ namespace McAuthz.Requirements {
             patternMatch = ExpressionRuleCollection.GetPredicateExpression<Claim>().Compile();
         }
 
-        private Dictionary<Type, Expression> _cachedExpressions = new Dictionary<Type, Expression>();
+        private Dictionary<Type, dynamic> _cachedFunc = new Dictionary<Type, dynamic>();
         public Func<T, bool> BuildExpression<T>() {
-            if (_cachedExpressions.ContainsKey(typeof(T))) {
-                return ((Expression<Func<T,bool>>)_cachedExpressions[typeof(T)]).Compile();
+            if (_cachedFunc.ContainsKey(typeof(T))) {
+                return (Func<T,bool>)_cachedFunc[typeof(T)];
             }
-
 
             ExpressionRuleCollection = new ExpressionRuleCollection() {
                 Rules = new[] {
@@ -58,7 +57,7 @@ namespace McAuthz.Requirements {
             };
 
             var expression = ExpressionRuleCollection.GetPredicateExpression<T>() ?? PredicateBuilder.False<T>();
-            _cachedExpressions.Add(typeof(T), expression);
+            _cachedFunc.Add(typeof(T), expression.Compile());
             return expression.Compile();
         }
     }
