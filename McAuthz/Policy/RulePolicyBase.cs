@@ -29,7 +29,9 @@ namespace McAuthz.Policy {
         public virtual McAuthorizationResult EvaluateModel(dynamic inputs) {
             return new McAuthorizationResult { Succes = false };
         }
-
+        public virtual McAuthorizationResult EvaluateModel<T>(dynamic inputs) {
+            return new McAuthorizationResult { Succes = false };
+        }
         public virtual McAuthorizationResult EvaluatePrincipal(dynamic inputs) {
             return new McAuthorizationResult { Succes = false };
         }

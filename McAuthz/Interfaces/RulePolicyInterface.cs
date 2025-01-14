@@ -18,5 +18,6 @@ namespace McAuthz.Interfaces {
         public IEnumerable<string?> Keys();
         McAuthorizationResult EvaluatePrincipal(dynamic inputs);
         McAuthorizationResult EvaluateModel(dynamic inputs);
+        McAuthorizationResult EvaluateModel<T>(dynamic inputs);
     }
 }

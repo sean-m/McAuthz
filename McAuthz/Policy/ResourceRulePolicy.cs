@@ -33,11 +33,13 @@ namespace McAuthz.Policy
         private bool EvaluateModelList(IEnumerable<dynamic> models) {
             return models.All(x => MatchesRules(x));
         }
-
+        private bool EvaluateModelList<T>(IEnumerable<T> models) {
+            return models.All(x => MatchesRules<T>(x));
+        }
         private bool MatchesRules(dynamic model) {
 
             IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
-            return requirements.All(rule => {
+            var result = requirements.All(rule => {
                 if (model is Dictionary<string, string> dict) {
                     var func = rule.GetDictionaryFunc();
                     var result = func(dict);
@@ -54,7 +56,25 @@ namespace McAuthz.Policy
                 }
             });
 
-            return false;
+            return result;
+        }
+
+        private bool MatchesRules<T>(T model) {
+
+            IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
+            var result = requirements.All(rule => {
+                if (model is Dictionary<string, string> dict) {
+                    var func = rule.GetDictionaryFunc();
+                    var result = func(dict);
+                    return result;
+                } else {
+                    Func<T, bool> func = rule.GetPropertyFunc<T>();
+                    var result = func(model);
+                    return result;
+                }
+            });
+
+            return result;
         }
 
         public override McAuthorizationResult EvaluateModel(dynamic inputs) {
@@ -65,6 +85,18 @@ namespace McAuthz.Policy
             }
 
             result.Succes = MatchesRules(inputs);
+
+            return result;
+        }
+
+        public override McAuthorizationResult EvaluateModel<T>(dynamic inputs) {
+            var result = new McAuthorizationResult { Succes = false };
+
+            if (inputs is IEnumerable<T> enumerable) {
+                result.Succes = EvaluateModelList<T>(enumerable);
+            }
+
+            result.Succes = MatchesRules<T>(inputs);
 
             return result;
         }
@@ -81,7 +113,11 @@ namespace McAuthz.Policy
         public ResourceRulePolicy() { }
 
         public ResourceRulePolicy(IEnumerable<(string, string)> ResourceMatches) {
-
+            var requirements = new List<Requirement>();
+            foreach (var resourceMatch in ResourceMatches) {
+                requirements.Add(new PropertyRequirement(resourceMatch.Item1, resourceMatch.Item2));
+            }
+            Requirements = requirements;
         }
 
         #endregion  constructors

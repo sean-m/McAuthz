@@ -14,7 +14,7 @@ namespace McAuthz.Requirements {
         }
 
         public Func<T, bool>? GetPropertyFunc<T>() {
-            return ExpressionRuleCollection.GetPredicateExpression<T>()?.Compile();
+            return BuildExpression<T>();
         }
     }
 }
