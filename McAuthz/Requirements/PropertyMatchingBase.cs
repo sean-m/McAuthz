@@ -1,6 +1,7 @@
 ﻿using McRule;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 
@@ -38,6 +39,27 @@ namespace McAuthz.Requirements {
             };
 
             patternMatch = ExpressionRuleCollection.GetPredicateExpression<Claim>().Compile();
+        }
+
+        private Dictionary<Type, Expression> _cachedExpressions = new Dictionary<Type, Expression>();
+        public Func<T, bool> BuildExpression<T>() {
+            if (_cachedExpressions.ContainsKey(typeof(T))) {
+                return ((Expression<Func<T,bool>>)_cachedExpressions[typeof(T)]).Compile();
+            }
+
+
+            ExpressionRuleCollection = new ExpressionRuleCollection() {
+                Rules = new[] {
+                    new ExpressionRule(typeof(T).Name, ClaimName, ClaimValue),
+                    new ExpressionRule(typeof(Dictionary<string,string>).Name, ClaimName.ToLower(), ClaimValue)
+                },
+                TargetType = typeof(Claim).Name,
+                RuleOperator = RuleOperator.Or
+            };
+
+            var expression = ExpressionRuleCollection.GetPredicateExpression<T>() ?? PredicateBuilder.False<T>();
+            _cachedExpressions.Add(typeof(T), expression);
+            return expression.Compile();
         }
     }
 }

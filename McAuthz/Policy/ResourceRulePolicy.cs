@@ -35,6 +35,7 @@ namespace McAuthz.Policy
         }
 
         private bool MatchesRules(dynamic model) {
+
             IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
             return requirements.All(rule => {
                 if (model is Dictionary<string, string> dict) {
@@ -42,11 +43,11 @@ namespace McAuthz.Policy
                     var result = func(dict);
                     return result;
                 } else {
-                    Type type = typeof(PropertyRequirement);
+                    Type type = typeof(PropertyMatchingBase);
                     Type modelType = model.GetType();
-                    MethodInfo method = type.GetMethod("GetPropertyFunc", BindingFlags.Public | BindingFlags.Instance);
+                    MethodInfo method = type.GetMethod("BuildExpression");
                     MethodInfo genericMethod = method.MakeGenericMethod(modelType);
-                    Func<dynamic, bool> func = (Func<dynamic, bool>)genericMethod.Invoke(rule, new object[] { });
+                    dynamic func = genericMethod.Invoke(rule, new object[] { });
 
                     var result = func(model);
                     return result;
