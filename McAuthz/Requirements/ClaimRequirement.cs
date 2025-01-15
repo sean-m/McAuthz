@@ -14,15 +14,14 @@ namespace McAuthz.Requirements {
 
 
         public bool EvaluateClaim(Claim claim) {
-            initExpression();
-
-            var result = patternMatch(claim);
+            var rule = BuildExpression<Claim>();
+            var result = rule(claim);
             return result;
         }
 
         public Predicate<Claim> GetPredicate() {
-            initExpression();
-            Predicate<Claim> pred = (input) => patternMatch(input);
+            var rule = BuildExpression<Claim>();
+            Predicate<Claim> pred = (input) => rule(input);
             return pred;
         }
     }
