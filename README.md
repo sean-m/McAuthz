@@ -1,4 +1,4 @@
-# McAuthz
+﻿# McAuthz
 A library that allows using policy based rules for authorization in asp.net core. 
 
 ## Kinds of Authorization
@@ -12,7 +12,7 @@ __________             ____________________________    ______________    _______
 |        |             |   Authorization Policy   |    | Controller |    | Resource Authorization |
 | Client | Request  -> | Inspect: Identity/Method | -> |            | -> |                        |
 |        | Response <- |                          | <- |            | <- |    Inspect objects     |
-----------             ----------------------------    --------------    --------------------------
+‾‾‾‾‾‾‾‾‾‾             ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
                        [     Request Policies     ]    [             Resource Policies            ]
 ```
 ### Policies
