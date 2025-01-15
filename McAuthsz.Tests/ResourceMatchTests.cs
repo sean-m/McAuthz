@@ -43,6 +43,14 @@ namespace McAuthz.Tests {
             };
             _rules.Add(neutralMonstersOnly);
 
+            var adventurerBardSilverleaf = new ResourceRulePolicy() {
+                Requirements = new Requirement[] {
+                    new PropertyRequirement(nameof(Adventurer.PrimaryClass),"~bard"),
+                    new PropertyRequirement(nameof(Adventurer.Name), "~*silverleaf")
+                },
+                TargetType = "Adventurer"
+            };
+            _rules.Add(adventurerBardSilverleaf);
 
             RuleProvider.PolicyCollection = _rules;
         }
@@ -60,13 +68,23 @@ namespace McAuthz.Tests {
         }
 
         [Test]
-        public void TestFilteringObjectsBasedOnStringContents() {
+        public void TestFilteringTypedObjectsBasedOnStringContents() {
             var policies = RuleProvider.Policies(typeof(NPC));
             Assert.NotNull(policies, $"Something wrong with he rule provider. No poliices for type: {typeof(NPC).Name}");
 
             var filtered = Monsters.Where(m => policies.Any(p => p.EvaluateModel<NPC>(m).Succes));
             Assert.IsFalse(filtered.Count() == Monsters.Count(), "The filtered data set has the same number of records as the source set, something's funky.");
             Assert.IsTrue(filtered.Count() > 0, "Policies were applied but none succeeded for the collection of monsters.");
+        }
+
+        [Test]
+        public void TestFilteringObjectsBasedOnStringContents() {
+            var policies = RuleProvider.Policies(typeof(Adventurer));
+            Assert.NotNull(policies, $"Something wrong with he rule provider. No poliices for type: {typeof(Adventurer).Name}");
+
+            var filtered = Adventurers.Where(m => policies.Any(p => p.EvaluateModel(m).Succes));
+            Assert.IsFalse(filtered.Count() == Adventurers.Count(), "The filtered data set has the same number of records as the source set, something's funky.");
+            Assert.IsTrue(filtered.Count() >= 2, $"There should be two Silverleaf siblings who are bards but we matched on {filtered.Count()}.");
         }
     }
 
@@ -87,8 +105,8 @@ namespace McAuthz.Tests {
         public string Name { get; init; }
         public string Title { get; init; }
         public string Renown { get; init; }
-        public CharClass PrimaryClass { get; init; }
-        public CharClass SecondaryClass { get; init; }
+        public string PrimaryClass { get; init; }
+        public string SecondaryClass { get; init; }
         public string Alignment { get; init; }
         public int Gold { get; set; } = 0;
         public int Hp { get; set; } = 40;
@@ -99,8 +117,8 @@ namespace McAuthz.Tests {
         public int Speed { get; set; } = 4;
 
         public Adventurer() { }
-        public Adventurer(string name, string title, string renown, CharClass primaryClass,
-            CharClass secondaryClass, string alignment,
+        public Adventurer(string name, string title, string renown, string primaryClass,
+            string secondaryClass, string alignment,
             int gold = 0, int hp = 40, int constitution = 4, int strength = 4,
             int intelligence = 4, int agility = 4, int speed = 4) {
             Name = name;
