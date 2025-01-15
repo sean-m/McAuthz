@@ -12,7 +12,7 @@ using System.Text;
 
 namespace McAuthz.Policy
 {
-    public class ResourceRulePolicy : RequestPolicy, RulePolicy {
+    public class ResourceRulePolicy : RulePolicyBase, RulePolicy {
 
         #region properties
 
@@ -22,8 +22,9 @@ namespace McAuthz.Policy
 
         public ResourceRulePolicy() {  }
 
-        public ResourceRulePolicy(IEnumerable<Requirement> Requirements) : base(Requirements) {
+        public ResourceRulePolicy(IEnumerable<Requirement> Requirements) : base() {
 
+            ((List<Requirement>)this.Requirements).AddRange(Requirements);
         }
 
         #endregion  // constructors
@@ -62,17 +63,10 @@ namespace McAuthz.Policy
         private bool MatchesRules<T>(T model) {
 
             IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
-            var result = requirements.All(rule => {
-                if (model is Dictionary<string, string> dict) {
-                    var func = rule.GetDictionaryFunc();
-                    var result = func(dict);
-                    return result;
-                } else {
-                    Func<T, bool> func = rule.GetPropertyFunc<T>();
-                    var result = func(model);
-                    return result;
-                }
-            });
+
+            var rules = requirements.Select(r => r.BuildExpression<T>());
+            var combined = rules.Aggregate((a, b) => (x) => a(x) && b(x));
+            var result = combined(model);
 
             return result;
         }
