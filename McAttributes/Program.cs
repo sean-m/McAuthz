@@ -94,6 +94,7 @@ builder.Services.AddAuthorization(options => {
         .RequireAuthenticatedUser()
         .Build();
 });
+// This provides the authorization handler serviced with UseMcAuthorization() below.
 builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
 
 
@@ -148,6 +149,7 @@ app.UseAuthentication();
 app.MapControllers();
 app.UseRouting();
 
+// Process any explicitly registerd policies then McAuthorization policies.
 app.UseAuthorization();
 app.UseMcAuthorization();
 
