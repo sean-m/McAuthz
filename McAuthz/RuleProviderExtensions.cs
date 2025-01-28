@@ -81,7 +81,7 @@ namespace McAuthz {
                 return result.First();
             }
 
-            return result.Aggregate((a, b) => (x) => a(x) || b(x)); ;
+            return result.Aggregate((a, b) => (x) => a(x) || b(x));
         }
     }
 }

@@ -55,29 +55,38 @@ namespace McAuthz.Policy {
             return authenticatedEval && claimEval && claimExprEval && roleEval;
         }
 
-        private bool EvaluateOnClaim(Claim claim) {
-            return ClaimRequirements.Any(x => x.EvaluateClaim(claim));
-        }
+        public Func<T, bool> GetFunc<T>(ClaimsPrincipal identity) {
+            var result = new List<Func<T, bool>>();
 
-        public Func<T, bool>? GetFunc<T>(ClaimsPrincipal identity) {
-            if (AppliesToIdentity(identity)) {
-                var propertyRequirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
-                var rules = propertyRequirements.Select(r => r.BuildExpression<T>());
-                return rules.Count() switch {
-                    0 => null,
-                    1 => rules.First(),
-                    _ => rules.Aggregate((a, b) => (x) => a(x) && b(x))
-                };
+            foreach (ClaimsIdentity ci in identity.Identities) {
+                var identityRule = GetFunc<T>( ci);
+                if (identityRule != null) { result.Add(identityRule); }
             }
 
-            return null;
+            if (result.Count() == 0) {
+                return (T x) => false;
+            }
+
+            if (result.Count() == 1) {
+                return result.First();
+            }
+
+            return result.Aggregate((a, b) => (x) => a(x) || b(x));
         }
 
         public Func<T, bool>? GetFunc<T>(ClaimsIdentity identity) {
             if (AppliesToIdentity(identity)) {
                 var propertyRequirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
-                var rules = propertyRequirements.Select(r => r.BuildExpression<T>());
-                var combined = rules.Aggregate((a, b) => (x) => a(x) && b(x));
+                var result = propertyRequirements.Select(r => r.BuildExpression<T>());
+                if (result.Count() == 0) {
+                    return (T x) => false;
+                }
+
+                if (result.Count() == 1) {
+                    return result.First();
+                }
+
+                var combined = result.Aggregate((a, b) => (x) => a(x) || b(x));
                 return combined;
             }
 
