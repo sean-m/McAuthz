@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace McAuthz.Requirements {
 #if DEBUG
+/*
+This has the same thing going that ClaimExpression does. Go read the block comment over there.
+*/
     public class ExpressionRequirement : Requirement {
         public ExpressionRequirement() {
 

@@ -4,6 +4,12 @@ using System.Text;
 
 namespace McAuthz.Requirements {
 #if DEBUG
+/*
+This is/was a work in progress. The idea was to allow for a claim to be evaluated using a lambda expression
+resolved at runtime but places a requirement on something like DynamicLinq and darn it, that
+thing can't help but get hit with code injection vulnerabilities every year. So this is going
+to sit here until we really need it.
+*/
     public class ClaimExpression : ClaimRequirement {
         public new Type ValueType { get => typeof(Func<string, bool>); }
 
