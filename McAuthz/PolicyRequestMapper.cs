@@ -12,7 +12,10 @@ using System.Xml.Serialization;
 
 namespace McAuthz
 {
-    public class PolicyRequestMapper {
+    public interface PolicyRequestMapperInterface {
+        bool IsAuthorized(HttpContext context);
+    }
+    public class PolicyRequestMapper : PolicyRequestMapperInterface {
 
         private ILogger<PolicyRequestMapper> logger;
         private RuleProviderInterface rules;
@@ -23,7 +26,7 @@ namespace McAuthz
             this.rules = rules;
         }
 
-        internal bool IsAuthorized(HttpContext context) {
+        public bool IsAuthorized(HttpContext context) {
             // Inspect the context using provided policy rules
             string path = context.Request.Path;
             string action = context.Request.Method;

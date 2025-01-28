@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.UI;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.ModelBuilder.Core.V1;
 using System.Data;
 
 static IEdmModel GetEdmModel() {
@@ -78,13 +79,24 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI(); ;
 
-
+// It makes some sense for RuleProvider to be a singleton, that way there's one place
+// in the application that houses policies.
 var ruleProvider = new RuleProvider();
-
 builder.Services.AddSingleton<RuleProviderInterface>(ruleProvider);
-builder.Services.AddSingleton<PolicyRequestMapper>();
+
+// The policy request mapper is what associates requests to rules and evaluates them.
+builder.Services.AddScoped<PolicyRequestMapperInterface, PolicyRequestMapper>((IServiceProvider svc) => {
+    var logger = svc.GetRequiredService<ILogger<PolicyRequestMapper>>();
+    var rules = svc.GetRequiredService<RuleProviderInterface>();
+    return new PolicyRequestMapper(logger, rules);
+});
+
+// This provides the authorization handler serviced with UseMcAuthorization() below.
+builder.Services.AddScoped<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
+
 // This is used for resource authorization rules. That is policies that inspect the resources which are handled in the controller.
 builder.Services.AddAuthorization(options => {
+    // The McAuthorizationMiddleware needs this policy requirement in order to be proccessed.
     options.AddPolicy(
         Globals.McPolicy,
         policyBuilder => policyBuilder.Requirements.Add(
@@ -94,8 +106,7 @@ builder.Services.AddAuthorization(options => {
         .RequireAuthenticatedUser()
         .Build();
 });
-// This provides the authorization handler serviced with UseMcAuthorization() below.
-builder.Services.AddSingleton<IAuthorizationHandler, RequireMcRuleApprovedHandler>();
+
 
 
 // Add services to the container.
@@ -110,16 +121,14 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     opt => opt.ResolveConflictingActions(a => a.First()));
-builder.Logging.AddConsole();
-
 
 
 var connString = "Data Source=test.db";
 builder.Services.AddDbContext<IdDbContext>(
     options => { options.UseSqlite(connString); });
 
-var app = builder.Build();
 
+var app = builder.Build();
 
 using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
 {

@@ -16,7 +16,7 @@ namespace McAuthz {
 
     public static class Extensions {
         public static IApplicationBuilder UseMcAuthorization(this IApplicationBuilder app) {
-            return app.UseMiddleware<McAuthorizationMiddleware>();
+                return app.UseMiddleware<McAuthorizationMiddleware>();
         }
 
         /// <summary>
@@ -73,6 +73,7 @@ namespace McAuthz {
                 throw new Exception($"Uncaught exception in while evaluating resource rules for type '{resourceType}'", ex);
             }
         }
+
     }
 
     public static class Globals {
