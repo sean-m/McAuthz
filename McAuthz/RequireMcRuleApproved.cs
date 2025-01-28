@@ -70,7 +70,7 @@ namespace McAuthz
             if (context.User.Identity.IsAuthenticated) {
 
                 var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
-                var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.NotAuthenticated);
+                var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.Unauthenticated);
 
                 // For all authenticated identities, enumerate claims, evaluate against
                 // rules for any matches.

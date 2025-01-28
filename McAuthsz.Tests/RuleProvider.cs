@@ -3,8 +3,10 @@ using McAuthz.Policy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework.Constraints;
 
 namespace McAuthz.Tests.Plumbing {
 
@@ -27,6 +29,17 @@ namespace McAuthz.Tests.Plumbing {
         public IEnumerable<RulePolicy> Policies(string route) {
             System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules(route) : Rule set fetched.");
             return PolicyCollection.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public IEnumerable<FilterPolicy> Filters(string type, ClaimsIdentity identity)
+        {
+            var filterPolicies  = PolicyCollection.Where(x => x.TargetType.Equals(type))
+                .Where(x => x is FilterPolicy)
+                .Cast<FilterPolicy>().ToList();
+
+            var results = filterPolicies
+                .Where(fp => fp.AppliesToIdentity(identity)).ToList();
+            return results;
         }
 
         public IEnumerable<RulePolicy> Policies(string route, string action) {

@@ -1,5 +1,6 @@
 ﻿using McAuthz.Interfaces;
 using McAuthz.Policy;
+using McAuthz.Requirements;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,15 @@ namespace McAuthz
             this.rules = rules;
         }
 
+        public Func<T,bool> GetPredicateForType<T>(string path, string action) {
+            IEnumerable<ResourceRulePolicy> effectivePolicies =
+                rules.Policies(typeof(T).Name).Where(x => x is ResourceRulePolicy).Cast<ResourceRulePolicy>();
+
+            var combined = effectivePolicies.Select(p => p.GetFunc<T>())
+                .Aggregate((a, b) => (x) => a(x) && b(x)); ;
+            return combined;
+        }
+
         public bool IsAuthorized(HttpContext context) {
             // Inspect the context using provided policy rules
             string path = context.Request.Path;
@@ -37,7 +47,7 @@ namespace McAuthz
             if (context.User.Identity.IsAuthenticated) {
 
                 var claimsId = context.User.Identities.Where(i => i.IsAuthenticated);
-                var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.NotAuthenticated);
+                var rules = effectivePolicies.Where(x => x.Authentication != AuthenticationStatus.Unauthenticated);
 
                 // For all authenticated identities, enumerate claims, evaluate against
                 // rules for any matches.

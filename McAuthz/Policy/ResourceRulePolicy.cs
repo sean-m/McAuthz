@@ -12,10 +12,11 @@ using System.Text;
 
 namespace McAuthz.Policy
 {
+
     public class ResourceRulePolicy : RulePolicyBase, RulePolicy {
 
         #region properties
-
+        // Rules are encoded as an IEnumerable of Requirements, held in the base class.
         #endregion  // properties
 
         #region constructors
@@ -61,13 +62,8 @@ namespace McAuthz.Policy
         }
 
         private bool MatchesRules<T>(T model) {
-
-            IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
-
-            var rules = requirements.Select(r => r.BuildExpression<T>());
-            var combined = rules.Aggregate((a, b) => (x) => a(x) && b(x));
+            var combined = GetFunc<T>();
             var result = combined(model);
-
             return result;
         }
 

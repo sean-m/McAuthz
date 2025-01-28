@@ -2,7 +2,7 @@ using McAuthz.Policy;
 using McAuthz.Requirements;
 using System.Security.Claims;
 
-namespace McAuthz.Tests {
+namespace McAuthz.Tests.PredicateTests {
     public class ClaimMatchTests {
 
         RequestPolicy matchSean = new RequestPolicy(
@@ -52,7 +52,7 @@ namespace McAuthz.Tests {
             var msg = "Pattern matching should interpret this object as a Claim.";
             object me = new Claim("name", "Sean McArdle");
 
-            var result = matchSean.EvaluatePrincipal( me );
+            var result = matchSean.EvaluatePrincipal(me);
             Assert.IsTrue(result.Succes, msg);
         }
 

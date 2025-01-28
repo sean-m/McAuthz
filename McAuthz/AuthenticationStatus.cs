@@ -4,7 +4,7 @@ using System.Text;
 
 namespace McAuthz {
     public enum AuthenticationStatus {
-        NotAuthenticated=-1,
+        Unauthenticated=-1,
         Authenticated,
         Any
     }

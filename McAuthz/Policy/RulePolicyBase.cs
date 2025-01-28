@@ -10,6 +10,8 @@ using System.Security.Claims;
 
 namespace McAuthz.Policy {
     public class RulePolicyBase : RulePolicy {
+
+
         public RulePolicyBase() {
         }
 
@@ -22,6 +24,14 @@ namespace McAuthz.Policy {
 
         public IEnumerable<string?> Keys() {
             return Requirements.Select(r => r.Key);
+        }
+
+        public Func<T, bool> GetFunc<T>() {
+            IEnumerable<PropertyRequirement> requirements = Requirements.Where(r => r is PropertyRequirement).Cast<PropertyRequirement>();
+
+            var rules = requirements.Select(r => r.BuildExpression<T>());
+            var combined = rules.Aggregate((a, b) => (x) => a(x) && b(x));
+            return combined;
         }
 
         public Guid Id => throw new NotImplementedException();

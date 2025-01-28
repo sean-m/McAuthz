@@ -1,13 +1,74 @@
-"name"," title"," renown"," primaryClass"," secondaryClass"," alignment"," gold"," hp"," constitution"," strength"," intelligence"," agility"," speed"
-"Zara Stormblade ",,"wields a sword forged from lightning ","warior",,,,,,,,,
-"Kira Nightfall",,"uses stealth and shadow magic to infiltrate and assassinate her enemies","rogue",,,,,,,,,
-"Tharion Sunstrider",,"specializes in fire and light spells","mage",,,,,,,,,
-"Ragnor Ironfist",,"dwarf fighter who is renowned for his strength and endurance","fighter",,,,,,,,,
-"Lila Silverleaf",,"charms and entertains with her songs and stories","bard",,,,,,,,,
-"Cheole Silverleaf",,"travels with his sister, charms and entertains with his songs and stories","bard",,,,,,,,,
-"Tim Silverleaf",,"hates travel, loves books","monk",,,,,,,,,
-"Varis Moonshadow",,"adept at tracking and hunting in the wilderness","ranger",,,,,,,,,
-"Nara Brightstar",,"serves the goddess of healing and wisdom","cleric",,,,,,,,,
-"Darius Blackthorn",,"made a pact with a dark entity for power and knowledge","warlock",,,,,,,,,
-"Sora Swiftwing",,"follows the path of the wind and the sky","monk",,,,,,,,,
-"Aran Frostborn",,"hails from the frozen lands of the north","warior",,,,,,,,,
+"name","title","renown"," primaryClass "," secondaryClass"," alignment","gold"," hp","constitution","strength","intelligence","agility","speed"
+"Zara Stormblade ",,"wields a sword forged from lightning ","warior",,"neutral",100,85,14,18,12,15,10
+"Kira Nightfall",,"uses stealth and shadow magic to infiltrate and assassinate her enemies","rogue",,"chaotic neutral",50,70,12,14,16,18,20
+"Tharion Sunstrider",,"specializes in fire and light spells","mage",,"lawful good",200,60,10,8,20,12,10
+"Ragnor Ironfist",,"dwarf fighter who is renowned for his strength and endurance","fighter",,"lawful neutral",150,95,18,20,10,10,8
+"Lila Silverleaf",,"charms and entertains with her songs and stories","bard",,"chaotic good",75,65,10,12,18,14,12
+"Cheole Silverleaf",,"travels with his sister, charms and entertains with his songs and stories","bard",,"chaotic good",75,65,10,12,18,14,12
+"Tim Silverleaf",,"hates travel, loves books","monk",,"neutral good",30,55,12,10,20,16,14
+"Varis Moonshadow",,"adept at tracking and hunting in the wilderness","ranger",,"neutral",100,80,14,16,14,18,16
+"Nara Brightstar",,"serves the goddess of healing and wisdom","cleric",,"lawful good",120,70,12,10,18,12,10
+"Darius Blackthorn",,"made a pact with a dark entity for power and knowledge","warlock",,"chaotic evil",200,60,10,8,20,12,10
+"Sora Swiftwing",,"follows the path of the wind and the sky","monk",,"neutral good",50,75,12,14,16,18,20
+"Aran Frostborn",,"hails from the frozen lands of the north","warior",,"neutral",100,85,14,18,12,15,10
+"Eldrin Starfire",,"master of arcane arts and ancient spells","wizard",,"lawful good",200,60,10,8,20,12,10
+"Fiona Shadowstep",,"expert in stealth and silent takedowns","assassin",,"chaotic neutral",50,70,12,14,16,18,20
+"Grimnar Stoneheart",,"stalwart defender of his clan","dwarf",,"lawful neutral",150,95,18,20,10,10,8
+"Lyra Moonwhisper",,"weaves illusions and enchantments","sorcerer",,"chaotic good",75,65,10,12,18,14,12
+"Jareth Windrider",,"swift and agile, master of the bow","archer",,"neutral",100,80,14,16,14,18,16
+"Kael Firebrand",,"wields the power of flames","pyromancer",,"chaotic neutral",200,60,10,8,20,12,10
+"Mira Lightbringer",,"healer and protector of the weak","paladin",,"lawful good",120,70,12,10,18,12,10
+"Orin Ironclad",,"unbreakable and steadfast in battle","knight",,"lawful neutral",150,95,18,20,10,10,8
+"Perin Swiftfoot",,"quick and nimble, master of traps","thief",,"chaotic neutral",50,70,12,14,16,18,20
+"Quinn Stormcaller",,"commands the fury of the storm","elementalist",,"neutral",200,60,10,8,20,12,10
+"Raven Darkwood",,"mysterious and elusive, master of shadows","ninja",,"chaotic neutral",50,70,12,14,16,18,20
+"Selene Starfall",,"calls upon the power of the stars","astronomer",,"neutral good",200,60,10,8,20,12,10
+"Talon Blackhawk",,"fierce and relentless in combat","barbarian",,"chaotic neutral",100,90,18,20,10,12,8
+"Ulric Frosthammer",,"wields a hammer imbued with frost magic","ice warrior",,"neutral",150,85,16,18,12,14,10
+"Vesper Nightshade",,"poison expert and master of toxins","alchemist",,"neutral evil",75,65,10,12,18,14,12
+"Wren Silverwing",,"graceful and deadly with a blade","duelist",,"chaotic good",100,75,14,16,14,18,16
+"Xander Ironforge",,"crafts and wields powerful weapons","blacksmith",,"neutral",150,85,16,18,12,14,10
+"Yara Stormsinger",,"controls the weather with her voice","storm mage",,"neutral good",200,60,10,8,20,12,10
+"Zane Shadowblade",,"silent and deadly assassin","shadow dancer",,"chaotic neutral",50,70,12,14,16,18,20
+"Ayla Stormrider",,"rides the winds and commands lightning","storm knight",,"neutral good",100,80,14,16,14,18,16
+"Bran Ironshield",,"defender of the weak with an unbreakable shield","guardian",,"lawful good",150,95,18,20,10,10,8
+"Cassia Moonblade",,"swift and deadly with her twin blades","blade dancer",,"chaotic good",75,75,12,14,18,16,18
+"Damon Fireheart",,"wields the power of the inferno","fire mage",,"chaotic neutral",200,60,10,8,20,12,10
+"Elara Starwhisper",,"calls upon the power of the cosmos","celestial mage",,"neutral good",200,60,10,8,20,12,10
+"Finn Swiftstrike",,"quick and precise with his strikes","martial artist",,"neutral",100,75,14,16,14,18,16
+"Galen Earthshaker",,"commands the power of the earth","geomancer",,"neutral",150,85,16,18,12,14,10
+"Hale Stormbringer",,"brings the fury of the storm","storm warrior",,"neutral good",100,80,14,16,14,18,16
+"Iris Lightweaver",,"weaves light into powerful spells","light mage",,"lawful good",200,60,10,8,20,12,10
+"Jax Nightblade",,"moves silently and strikes from the shadows","shadow assassin",,"chaotic neutral",50,70,12,14,16,18,20
+"Kara Frostwind",,"commands the power of ice and wind","frost mage",,"neutral",200,60,10,8,20,12,10
+"Lorin Firestorm",,"unleashes the fury of fire","fire warrior",,"chaotic neutral",100,85,14,18,12,15,10
+"Mara Moonshadow",,"moves silently and strikes with precision","shadow rogue",,"chaotic neutral",50,70,12,14,16,18,20
+"Nico Stormcaller",,"commands the power of the storm","storm caller",,"neutral",200,60,10,8,20,12,10
+"Oren Earthwarden",,"defender of the earth and its creatures","earth guardian",,"neutral good",150,85,16,18,12,14,10
+"Piper Lightfoot",,"quick and nimble, master of evasion","acrobat",,"chaotic good",50,75,12,14,18,16,18
+"Aria Moonshadow",,"master of lunar magic","lunar mage",,"neutral good",150,70,12,10,20,14,12
+"Brynn Firestorm",,"wields the power of fire and destruction","fire mage",,"chaotic neutral",200,65,10,8,20,12,10
+"Celeste Starwhisper",,"calls upon the power of the stars","star mage",,"neutral good",180,60,10,8,20,12,10
+"Darian Frostwind",,"commands the power of ice and cold","ice mage",,"neutral",170,70,12,10,20,14,12
+"Elysia Stormbringer",,"controls the weather and storms","storm mage",,"neutral good",190,65,10,8,20,12,10
+"Fiona Lightweaver",,"weaves light into powerful spells","light mage",,"lawful good",200,60,10,8,20,12,10
+"Gideon Earthshaker",,"commands the power of the earth","earth mage",,"neutral",160,75,12,10,20,14,12
+"Hazel Shadowcaster",,"uses shadow magic to deceive and destroy","shadow mage",,"chaotic neutral",150,70,10,8,20,12,10
+"Ivy Windrider",,"controls the power of the wind","wind mage",,"neutral good",180,65,10,8,20,12,10
+"Jasper Sunfire",,"wields the power of the sun and fire","sun mage",,"lawful good",200,60,10,8,20,12,10
+"Kai Stormcaller",,"commands the fury of the storm","storm mage",,"neutral",190,65,10,8,20,12,10
+"Luna Starfall",,"calls upon the power of the moon and stars","moon mage",,"neutral good",180,60,10,8,20,12,10
+"Milo Frostborn",,"commands the power of ice and frost","frost mage",,"neutral",170,70,12,10,20,14,12
+"Nina Fireheart",,"wields the power of fire and passion","fire mage",,"chaotic neutral",200,65,10,8,20,12,10
+"Orion Starfire",,"calls upon the power of the stars","star mage",,"neutral good",180,60,10,8,20,12,10
+"Piper Lightbringer",,"weaves light into powerful spells","light mage",,"lawful good",200,60,10,8,20,12,10
+"Quinn Earthwarden",,"commands the power of the earth","earth mage",,"neutral",160,75,12,10,20,14,12
+"Raven Shadowweaver",,"uses shadow magic to deceive and destroy","shadow mage",,"chaotic neutral",150,70,10,8,20,12,10
+"Sage Windwalker",,"controls the power of the wind","wind mage",,"neutral good",180,65,10,8,20,12,10
+"Thalia Sunstrider",,"wields the power of the sun and fire","sun mage",,"lawful good",200,60,10,8,20,12,10
+"Uriel Stormbringer",,"commands the fury of the storm","storm mage",,"neutral",190,65,10,8,20,12,10
+"Vera Moonshadow",,"calls upon the power of the moon and stars","moon mage",,"neutral good",180,60,10,8,20,12,10
+"Wren Frostweaver",,"commands the power of ice and frost","frost mage",,"neutral",170,70,12,10,20,14,12
+"Xander Firestorm",,"wields the power of fire and destruction","fire mage",,"chaotic evil",200,65,10,8,20,12,10
+"Yara Starwhisper",,"calls upon the power of the stars","star mage",,"neutral good",180,60,10,8,20,12,10
+"Zane Lightweaver",,"weaves light into powerful spells","light mage",,"lawful good",200,60,10,8,20,12,10
