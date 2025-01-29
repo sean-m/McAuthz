@@ -24,7 +24,7 @@ namespace McAuthz.Tests.PredicateTests {
         public void PropertyRequirementWorksOnDictionary() {
             var requirement = new PropertyRequirement("alignment", "~*neutral*");
             var func = requirement.GetDictionaryFunc();
-            string expressionString = requirement.GetDictionaryFuncString();
+            //string expressionString = requirement.GetDictionaryFuncString();
             Assert.That(func(npc), Is.True);
         }
 
