@@ -50,6 +50,22 @@ namespace McAuthz.Requirements {
             return expression.Compile();
         }
 
+        public string? BuildExpressionString<T>() {
+
+            var expressionCollection = new ExpressionRuleCollection() {
+                Rules = new[] {
+                    new ExpressionRule(typeof(T).Name, ClaimName, ClaimValue),
+                    new ExpressionRule(typeof(Dictionary<string,string>).Name, ClaimName.ToLower(), ClaimValue)
+                },
+                TargetType = typeof(T).Name,
+                RuleOperator = RuleOperator.And
+            };
+            ((List<IExpressionPolicy>)ExpressionRuleCollection.Rules).Add(expressionCollection);
+
+            var expression = expressionCollection.GetPredicateExpression<T>();
+            return expression?.ToString();
+        }
+
         /// <summary>
         /// Intializes a custom pattern match for the Claim type. Where a rule is generally intended to match
         /// on a given member field, what would specify the member name should match ClaimName and the value
