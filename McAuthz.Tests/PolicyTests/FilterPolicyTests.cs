@@ -103,5 +103,21 @@ namespace McAuthz.Tests.PolicyTests {
             var xanderScope = Adventurers.Where(xanderFilter);
             Assert.That(xanderScope.Count(), Is.Not.EqualTo(allMages.Count()));
         }
+
+        [Test]
+        public void AdminPolicyDoesNotApplyToNonAdmins()
+        {
+            // We've gotta make sure I did the thing right. If the policy doesn't get associated
+            // to the correct identity, that's a problem.
+            
+            var tharionFilter = RuleProvider.Filters<Adventurer>(tharion);
+            var xanderFilter = RuleProvider.Filters<Adventurer>(xanderFirestormIdentity);
+            
+            Assert.That(tharionFilter, Is.Not.Null);
+            Assert.That(xanderFilter, Is.Not.Null);
+            Assert.That(tharionFilter, Is.Not.EqualTo(xanderFilter));
+            CollectionAssert.AreEquivalent(Adventurers.Where(tharionFilter), Adventurers.Where(tharionFilter));
+            CollectionAssert.AreNotEquivalent(Adventurers.Where(tharionFilter), Adventurers.Where(xanderFilter));
+        }
     }
 }
