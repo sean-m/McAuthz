@@ -43,13 +43,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="src\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Requirements\ClaimExpression.cs" />
-    <Compile Remove="Requirements\ExpressionRequirement.cs" />
-  </ItemGroup>
-
 </Project>
