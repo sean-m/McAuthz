@@ -11,14 +11,14 @@ namespace McAuthz.Requirements {
 
         }
         protected PropertyMatchingBase(string name, string value) {
-            ClaimName = name;
-            ClaimValue = value;
+            Name = name;
+            Value = value;
         }
 
-        public string ClaimName { get; set; }
-        public string ClaimValue { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
 
-        public string? Key { get => ClaimName; }
+        public string? Key { get => Name; }
 
         private Dictionary<Type, dynamic> _cachedFunc = new Dictionary<Type, dynamic>();
         private Dictionary<Type, dynamic> _cachedExpr = new Dictionary<Type, dynamic>();
@@ -48,11 +48,11 @@ namespace McAuthz.Requirements {
             }
 
             var expressionRules = new List<IExpressionPolicy> {
-                new ExpressionRule(typeof(T).Name, ClaimName, ClaimValue),
+                new ExpressionRule(typeof(T).Name, Name, Value),
             };
             if (typeof(T) != typeof(Dictionary<string, string>)) {
                 expressionRules.Add(
-                    new ExpressionRule(typeof(Dictionary<string, string>).Name, ClaimName.ToLower(), ClaimValue));
+                    new ExpressionRule(typeof(Dictionary<string, string>).Name, Name.ToLower(), Value));
             }
 
             var expressionCollection = new ExpressionRuleCollection() {
@@ -81,14 +81,14 @@ namespace McAuthz.Requirements {
 
         /// <summary>
         /// Intializes a custom pattern match for the Claim type. Where a rule is generally intended to match
-        /// on a given member field, what would specify the member name should match ClaimName and the value
-        /// should match ClaimValue so this tries to build a rule that matches an operator's intent.
+        /// on a given member field, what would specify the member name should match Name and the value
+        /// should match Value so this tries to build a rule that matches an operator's intent.
         /// </summary>
         private void InitClaimExpression() {
             var expressionCollection = new ExpressionRuleCollection() {
                 Rules = new[] {
-                    new ExpressionRule(typeof(Claim).Name, "Type", ClaimName),
-                    new ExpressionRule(typeof(Claim).Name, "Value", ClaimValue),
+                    new ExpressionRule(typeof(Claim).Name, "Type", Name),
+                    new ExpressionRule(typeof(Claim).Name, "Value", Value),
                 },
                 TargetType = typeof(Claim).Name,
                 RuleOperator = RuleOperator.And
