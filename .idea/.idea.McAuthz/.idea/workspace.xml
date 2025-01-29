@@ -10,9 +10,7 @@
   <component name="ChangeListManager">
     <list default="true" id="920458c8-ac9e-43c0-baad-147e8f0de74e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.McAuthz/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.McAuthz/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/McAuthz.Tests/PolicyTests/ResourceRulePolicyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/McAuthz.Tests/PolicyTests/ResourceRulePolicyTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/McAuthz/McAuthz.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/McAuthz/McAuthz.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/McAuthz/Policy/RequestPolicy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/McAuthz/Policy/RequestPolicy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/McAuthz.Tests/PolicyTests/FilterPolicyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/McAuthz.Tests/PolicyTests/FilterPolicyTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,36 +24,36 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2sHoqMq6v9xZmJH1K7NkxC9zEEP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "6be2929b-b014-41ae-b850-dcbe683e3081.executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;6be2929b-b014-41ae-b850-dcbe683e3081.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "/home/sean/.config/JetBrains/Rider2023.3/resharper-host/DecompilerCache",
-      "/home/sean/.config/JetBrains/Rider2023.3/resharper-host/SourcesCache",
-      "/home/sean/.local/share/Symbols/src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/home/sean/.config/JetBrains/Rider2023.3/resharper-host/DecompilerCache&quot;,
+      &quot;/home/sean/.config/JetBrains/Rider2023.3/resharper-host/SourcesCache&quot;,
+      &quot;/home/sean/.local/share/Symbols/src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.McAttributes">
     <configuration name="McAttributes" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/McAttributes/McAttributes.csproj" />
@@ -85,7 +83,10 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
   </component>
@@ -97,8 +98,18 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1738122051471</updated>
-      <workItem from="1738122056881" duration="2094000" />
+      <workItem from="1738122056881" duration="2127000" />
+      <workItem from="1738131960732" duration="337000" />
     </task>
+    <task id="LOCAL-00001" summary="Added some tests.">
+      <option name="closed" value="true" />
+      <created>1738125093978</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1738125093978</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -108,7 +119,7 @@
     <option name="coveragePercentColumnWidth" value="150" />
     <option name="sortOrder" value="DESCENDING" />
     <option name="sortedColumn" value="1" />
-    <option name="symbolColumnWidth" value="296" />
+    <option name="symbolColumnWidth" value="407" />
     <coverage-tree-state>
       <expand />
       <select />
@@ -117,5 +128,7 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Added some tests." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added some tests." />
   </component>
 </project>
