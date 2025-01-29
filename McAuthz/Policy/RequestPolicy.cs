@@ -23,9 +23,7 @@ namespace McAuthz.Policy {
         } = "ClaimSet";
 
         public IEnumerable<ClaimRequirement> ClaimRequirements { get => Requirements.Where(r => r is ClaimRequirement).Cast<ClaimRequirement>(); }
-#if DEBUG
-        public IEnumerable<ClaimExpression> ClaimExpressions { get => Requirements.Where(r => r is ClaimExpression).Cast<ClaimExpression>(); }
-#endif
+
         public IEnumerable<RoleRequirement> RoleRequirements { get => Requirements.Where(r => r is RoleRequirement).Cast<RoleRequirement>(); }
 
 #endregion  // properties

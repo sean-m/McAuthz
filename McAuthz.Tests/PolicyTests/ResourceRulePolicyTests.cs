@@ -117,5 +117,35 @@ namespace McAuthz.Tests.PolicyTests
             // Assert
             Assert.IsFalse(result.Succes);
         }
+
+        [Test]
+        public void ResourceRulePolicyWithGenericType()
+        {
+            // Arrange
+            var requirements = new Requirement[]
+            {
+                new PropertyRequirement("Alignment","~*neutral*"),
+                new PropertyRequirement("Type", "~*monster*")
+            };
+            var policy = new ResourceRulePolicy<NPC>()
+            {
+                Requirements = requirements,
+                Name = "Neutral Monster Policy",
+            };
+
+            Assert.That(policy.TargetType, Is.EqualTo(typeof(NPC).Name));
+            
+            
+            // Act
+            var results = Monsters.Select(m => new {result = policy.EvaluateModel(m), monster = m});
+            
+            // Assert
+            Assert.IsTrue(results.Any(r => r.result.Succes));
+            Assert.IsTrue(results.Where(r => 
+                r.monster.Alignment.ToLower().Contains("neutral") 
+                && r.monster.Type.ToLower().Contains("monster")
+                ).All(r => r.result.Succes)
+            );
+        }
     }
 }

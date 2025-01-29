@@ -47,4 +47,9 @@
     <Folder Include="src\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Requirements\ClaimExpression.cs" />
+    <Compile Remove="Requirements\ExpressionRequirement.cs" />
+  </ItemGroup>
+
 </Project>
