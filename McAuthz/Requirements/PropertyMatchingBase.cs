@@ -23,7 +23,7 @@ namespace McAuthz.Requirements {
         private Dictionary<Type, dynamic> _cachedFunc = new Dictionary<Type, dynamic>();
         private Dictionary<Type, dynamic> _cachedExpr = new Dictionary<Type, dynamic>();
 
-        public ExpressionRuleCollection ExpressionRuleCollection { get; set; } = new ExpressionRuleCollection() {
+        internal ExpressionRuleCollection ExpressionRuleCollection { get; set; } = new ExpressionRuleCollection() {
             Rules = new List<IExpressionPolicy>()
         };
 
