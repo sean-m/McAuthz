@@ -16,6 +16,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Core.V1;
 using System.Data;
+using System.Security.Claims;
 
 static IEdmModel GetEdmModel() {
     var edmBuilder = new ODataConventionModelBuilder();
@@ -272,6 +273,10 @@ public class RuleProvider : RuleProviderInterface {
 
         logger?.LogWarning($"No policies for type:{type}, returning empty set!");
         return Array.Empty<RulePolicy>();
+    }
+
+    public IEnumerable<FilterPolicy> Filters(string type, ClaimsIdentity identity) {
+        throw new NotImplementedException();
     }
 }
 public static class DictionaryExtensions {
