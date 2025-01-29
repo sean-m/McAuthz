@@ -73,9 +73,8 @@ namespace McAuthz.Policy {
                     if (Enum.TryParse(typeof(AuthenticationStatus), json[key]?.ToString(), out stat)) {
                         result.Authentication = (AuthenticationStatus)stat;
                     } else {
-                        // TODO log this
+                        Console.WriteLine($"Error parsing the 'authentication' key on a json record. Failed key value: '{json[key]}'");
                     }
-                    continue;
                 }
             }
 
@@ -85,50 +84,44 @@ namespace McAuthz.Policy {
         #region inspectPrincipal
 
         private  bool EvaluatePrincipal(ClaimsPrincipal principal) {
-            var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.GetPredicate())) : true;
+            var claimEval = !ClaimRequirements.Any() || ClaimRequirements.All(x => principal.HasClaim(x.GetPredicate()));
 
-            var claimExprEval = true;
+            var roleEval = !RoleRequirements.Any() || RoleRequirements.All(x => principal.IsInRole(x.RoleName));
 
-            var roleEval = RoleRequirements.Count() > 0 ? RoleRequirements.All(x => principal.IsInRole(x.RoleName)) : true;
-
-            return claimEval && claimExprEval && roleEval;
+            return claimEval && roleEval;
         }
 
         private bool EvaluatePrincipal(ClaimsIdentity principal) {
-            var claimEval = ClaimRequirements.Count() > 0 ? ClaimRequirements.All(x => principal.HasClaim(x.GetPredicate())) : true;
+            var claimEval = !ClaimRequirements.Any() || ClaimRequirements.All(x => principal.HasClaim(x.GetPredicate()));
 
-            var claimExprEval = true;
+            string roleClaimType = principal.RoleClaimType;
+            var roleEval = !RoleRequirements.Any() || RoleRequirements.All(x => principal.HasClaim(roleClaimType, x.RoleName));
 
-            string roleClaimeType = principal.RoleClaimType;
-            var roleEval = RoleRequirements.Count() > 0 ? RoleRequirements.All(x => principal.HasClaim(roleClaimeType, x.RoleName)) : true;
-
-            return claimEval && claimExprEval && roleEval;
+            return claimEval && roleEval;
         }
 
         private bool EvaluateOnClaim(Claim claim) {
             return ClaimRequirements.Any(x => x.EvaluateClaim(claim));
         }
 
-        private bool EvaluateListOfClaims(List<Claim> lc) {
+        private bool EvaluateListOfClaims(List<Claim> claims) {
 
-            var claimEval = ClaimRequirements.Count() > 0
-                ? lc.All(claim => EvaluateOnClaim(claim))
-                : true;
+            var claimEval = !ClaimRequirements.Any() || claims.All(EvaluateOnClaim);
 
             return claimEval;
         }
 
         public override McAuthorizationResult EvaluatePrincipal(dynamic inputs) {
-            var evaluateSucces = new McAuthorizationResult {
+            var evaluateSuccess = new McAuthorizationResult {
                 Succes = false
             };
             if (inputs == null) {
-                evaluateSucces.FailureReason = "Principal cannot be null";
-                return evaluateSucces;
+                evaluateSuccess.FailureReason = "Principal cannot be null";
+                return evaluateSuccess;
             }
 
             try {
-                evaluateSucces.Succes = inputs switch {
+                evaluateSuccess.Succes = inputs switch {
                     ClaimsIdentity ci => EvaluatePrincipal(ci),
                     ClaimsPrincipal cp => EvaluatePrincipal(cp),
                     IEnumerable<Claim> lc => EvaluateListOfClaims(lc.ToList()),
@@ -136,11 +129,11 @@ namespace McAuthz.Policy {
                     _ => throw new NotImplementedException($"Not implemented for input type:{inputs?.GetType().Name}"),
                 };
             } catch (Exception e) {
-                evaluateSucces.Exception = e;
-                evaluateSucces.FailureReason = e.ToString();
+                evaluateSuccess.Exception = e;
+                evaluateSuccess.FailureReason = e.ToString();
             }
 
-            return evaluateSucces;
+            return evaluateSuccess;
         }
 
         #endregion  // inspectPrincipal
