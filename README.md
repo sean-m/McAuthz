@@ -50,3 +50,63 @@ ClaimsPrincipal. RequestPolicy failure short circuits the pipeline and returns a
 ### Resource Policies
 Resource policies evaluate at the middleware endpoint as part of the controller's processing. These policies are selected by inferring tyoe of the model being processed by a controller. The idea was inspired by the [Resource Based Authorization](https://andrewlock.net/resource-specific-authorisation-in-asp-net-core/) articles that became part of Andrew Lock's book ASP.NET Core In Action. It's great, go buy it.
 
+### Filter Policies
+These types are intended to be used as predicates in a query for a given record type. This allows
+for defining policies that restrict a subjects view of a database by appending a predicate to
+the user provided query.
+
+The business use case I have is for providing HR information to multiple busines organizations.
+Each org has their own IT staff that automate processes with this data, some IT units are shared
+by mutiple organizations, others are not. The overall view of the data itself should be limited
+based on who's asking. 
+
+This is what a couple policies might look like for a shared services IT administrators accessing
+personell records:
+```csharp
+var policySet = new [] {
+    new FilterPolicy
+    {
+        Name = "SuperGeek IT.Admin users in the SharedServices org can access Customer A records.",
+        TargetType = typeof(PersonellRecord).Name,
+        Requirements = new List<Requirement> {
+            new RoleRequirement("IT.Admin"),
+            new ClaimRequirement("Agency", "SuperGeek"),
+            new ClaimRequirement("Organization", "SharedServices"),
+            new PropertyRequirement("Agency", "~Customer A")
+        };
+    }
+    , new FilterPolicy {
+        Name = "SuperGeek IT.Admin users in the SharedServices org can access Customer B records.",
+        TargetType = typeof(PersonellRecord).Name,
+        Requirements = new List<Requirement> {
+            new RoleRequirement("IT.Admin"),
+            new ClaimRequirement("Agency", "SuperGeek"),
+            new ClaimRequirement("Organization", "SharedServices"),
+            new PropertyRequirement("Agency", "~Customer B")
+        };
+    }
+};
+```
+The Requirements stated include role, claim and property requirements. Role and claim requirements
+are matched against the principal making a request, property requirements are what become the predicate.
+Requirements inside a single policy are joined with an AND operator, while policies are joined with an OR.
+The conjoined policy set would end up looking something like:
+```csharp
+x => (
+    ((x.Agency != null) 
+        AndAlso x.Agency.Equals("Customer A", CurrentCulture)) 
+    OrElse Invoke(x => 
+        ((x.Agency != null) 
+            AndAlso x.Agency.Equals("Customer B", CurrentCulture)), x)
+)
+```
+
+This is the generated expression tree passed to a ToString(). It's not quite how you'd write it by hand,
+'x' for the parameter in multiple nested closures is a bit odd, but it works. The policy iteself generates
+an expression tree which is assembled recursively and using the same parameter name simplifies that. An
+important point about the expression is that it can be handed to Linq and EF will generate complementary
+SQL. Simply return `return db.Set.Where<User>(filterExpression)` from your controller and EF takes it from there. For
+bonus points, if you're using OData with asp.net core, the user's query is applied after returning from
+the controller so there's no additional work on your part.
+
+> Note: Case insensitive string matching for SQL generated queries depends on your backend database, out of the box. PostgreSQL for instance, is case sensitive by default. In order for case-insensitive matches to generate propery with the underlying McRule library, an ExpressionGenerator class must be implemented and used when generating the expression, [example here](https://github.com/sean-m/McRule/blob/main/McRule.EF/CoreExtensionFunctions.cs). There isn't yet a way to inject those with this authorization library but it's on my TODO list.
