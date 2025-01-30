@@ -26,9 +26,11 @@ namespace McAuthz.Tests.Plumbing {
             return PolicyCollection.Where(x => x.TargetType.Equals(type.FullName) || x.TargetType.Equals(type.Name));
         }
 
-        public IEnumerable<RulePolicy> Policies(string route) {
-            System.Diagnostics.Trace.WriteLine($"{DateTime.Now} RuleProvider.Rules(route) : Rule set fetched.");
-            return PolicyCollection.Where(x => x.Route == "*" || x.Route.Equals(route, StringComparison.CurrentCultureIgnoreCase));
+
+
+        public IEnumerable<RulePolicy> Policies(string type)
+        {
+            return PolicyCollection.Where(p => p is ResourceRulePolicy && p.TargetType.Like(type)) ?? Array.Empty<RulePolicy>();
         }
 
         public IEnumerable<FilterPolicy> Filters(string type, ClaimsIdentity identity)

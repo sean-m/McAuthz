@@ -49,7 +49,7 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
                     {
@@ -101,7 +101,7 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
                     {
@@ -148,7 +148,7 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
                     {
@@ -192,7 +192,7 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
                     {
@@ -244,7 +244,7 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
                     {
@@ -291,7 +291,7 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
                     {
@@ -340,11 +340,11 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
             {
-                new RequestPolicy
+                new ResourceRulePolicy<NPC>()
                 {
                     Name = "Model Policy",
                     Route = "/TestController",
@@ -359,7 +359,7 @@ namespace McAuthz.Tests.AspNet
 
             testRuleProvider.SetPolicies(policies);
 
-            var model = new { Name = "TestModel" };
+            var model = new NPC { Name = "TestModel" };
 
             // Act
             var result = requirement.IsAuthorized(context, model);
@@ -394,11 +394,11 @@ namespace McAuthz.Tests.AspNet
             var requestField = typeof(DefaultHttpContext).GetField("_request", BindingFlags.NonPublic | BindingFlags.Instance);
             requestField?.SetValue(httpContext, mockRequest);
 
-            var context = new AuthorizationHandlerContext(new[] { requirement }, principal, httpContext);
+            var context = new AuthorizationHandlerContext([requirement], principal, httpContext);
 
             var policies = new List<RulePolicy>
             {
-                new RequestPolicy
+                new ResourceRulePolicy<NPC>()
                 {
                     Name = "Model Policy",
                     Route = "/TestController",
@@ -413,7 +413,7 @@ namespace McAuthz.Tests.AspNet
 
             testRuleProvider.SetPolicies(policies);
 
-            var model = new { Name = "NonMatchingModel" };
+            var model = new NPC { Name = "NonMatchingModel" };
 
             // Act
             var result = requirement.IsAuthorized(context, model);
