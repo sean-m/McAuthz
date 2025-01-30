@@ -47,7 +47,7 @@ namespace McAuthz {
             string resourceType = "NULL";
             Type type = resource?.GetType();
             if (type != null && resource != null) {
-                resourceType = RequireMcRuleApproved.FigureOutPolicyType(type, resource);
+                resourceType = McRuleApprovedRequirement.FigureOutPolicyType(type, resource);
             }
 
             try {

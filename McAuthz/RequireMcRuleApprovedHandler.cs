@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 
 namespace McAuthz
 {
-    public class RequireMcRuleApprovedHandler : AuthorizationHandler<RequireMcRuleApproved> {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RequireMcRuleApproved requirement) {
+    public class RequireMcRuleApprovedHandler : AuthorizationHandler<McRuleApprovedRequirement> {
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, McRuleApprovedRequirement requirement) {
 
             var authorized = context.Resource == null
                 ? requirement.IsAuthorized(context)

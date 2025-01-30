@@ -14,7 +14,7 @@ using McAuthz.Tests.Plumbing;
 namespace McAuthz.Tests.AspNet
 {
     [TestFixture]
-    public class RequireMcRuleApprovedTests {
+    public class McRuleApprovedRequirementTests {
         private TestLogger _testLogger;
 
         [SetUp]
@@ -28,7 +28,7 @@ namespace McAuthz.Tests.AspNet
         {
             // Arrange
             var testRuleProvider = new RuleProvider();
-            var requirement = new RequireMcRuleApproved(_testLogger, testRuleProvider);
+            var requirement = new McRuleApprovedRequirement(_testLogger, testRuleProvider);
 
             var claims = new List<Claim>
                     {
@@ -56,7 +56,7 @@ namespace McAuthz.Tests.AspNet
                         new RequestPolicy
                         {
                             Name = "Admin Policy",
-                            Route = "TestController",
+                            Route = "/TestController",
                             Action = "GET",
                             Authentication = AuthenticationStatus.Authenticated,
                             Requirements = new List<Requirement>
@@ -80,7 +80,7 @@ namespace McAuthz.Tests.AspNet
         {
             // Arrange
             var testRuleProvider = new RuleProvider();
-            var requirement = new RequireMcRuleApproved(_testLogger, testRuleProvider);
+            var requirement = new McRuleApprovedRequirement(_testLogger, testRuleProvider);
 
             var claims = new List<Claim>
                     {
@@ -132,7 +132,7 @@ namespace McAuthz.Tests.AspNet
         {
             // Arrange
             var testRuleProvider = new RuleProvider();
-            var requirement = new RequireMcRuleApproved(_testLogger, testRuleProvider);
+            var requirement = new McRuleApprovedRequirement(_testLogger, testRuleProvider);
 
             var identity = new ClaimsIdentity();
             var principal = new ClaimsPrincipal(identity);
@@ -155,7 +155,7 @@ namespace McAuthz.Tests.AspNet
                         new RequestPolicy
                         {
                             Name = "Unauthenticated Policy",
-                            Route = "TestController",
+                            Route = "/TestController",
                             Action = "GET",
                             Authentication = AuthenticationStatus.Unauthenticated,
                             Requirements = new List<Requirement>()
@@ -176,7 +176,7 @@ namespace McAuthz.Tests.AspNet
         {
             // Arrange
             var testRuleProvider = new RuleProvider();
-            var requirement = new RequireMcRuleApproved(_testLogger, testRuleProvider);
+            var requirement = new McRuleApprovedRequirement(_testLogger, testRuleProvider);
 
             var identity = new ClaimsIdentity();
             var principal = new ClaimsPrincipal(identity);
@@ -223,7 +223,7 @@ namespace McAuthz.Tests.AspNet
         {
             // Arrange
             var testRuleProvider = new RuleProvider();
-            var requirement = new RequireMcRuleApproved(_testLogger, testRuleProvider);
+            var requirement = new McRuleApprovedRequirement(_testLogger, testRuleProvider);
 
             var claims = new List<Claim>
                     {
@@ -275,7 +275,7 @@ namespace McAuthz.Tests.AspNet
         {
             // Arrange
             var testRuleProvider = new RuleProvider();
-            var requirement = new RequireMcRuleApproved(_testLogger, testRuleProvider);
+            var requirement = new McRuleApprovedRequirement(_testLogger, testRuleProvider);
 
             var identity = new ClaimsIdentity();
             var principal = new ClaimsPrincipal(identity);

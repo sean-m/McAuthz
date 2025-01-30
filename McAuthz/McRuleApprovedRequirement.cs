@@ -14,7 +14,7 @@ using System.Text;
 
 namespace McAuthz
 {
-    public class RequireMcRuleApproved : IAuthorizationRequirement {
+    public class McRuleApprovedRequirement : IAuthorizationRequirement {
         private RuleProviderInterface rules;
         private ILogger? logger;
 
@@ -29,10 +29,10 @@ namespace McAuthz
         /// </summary>
         /// <param name="rules"></param>
         ///
-        public RequireMcRuleApproved(RuleProviderInterface rules) {
+        public McRuleApprovedRequirement(RuleProviderInterface rules) {
             this.rules = rules;
         }
-        public RequireMcRuleApproved(ILogger logger, RuleProviderInterface rules) {
+        public McRuleApprovedRequirement(ILogger logger, RuleProviderInterface rules) {
             this.logger = logger;
             this.rules = rules;
         }

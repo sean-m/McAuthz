@@ -101,7 +101,7 @@ builder.Services.AddAuthorization(options => {
     options.AddPolicy(
         Globals.McPolicy,
         policyBuilder => policyBuilder.Requirements.Add(
-            new RequireMcRuleApproved(ruleProvider))
+            new McRuleApprovedRequirement(ruleProvider))
     );
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
