@@ -17,6 +17,8 @@ namespace McAuthz.Policy {
 
         public string Name { get; set; }
         public new string TargetType { get; set; }
+
+
         public string Route { get; set; }
         public string Action { get; set; }
         public AuthenticationStatus Authentication { get; set; } = AuthenticationStatus.Authenticated;
