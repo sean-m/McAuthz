@@ -37,30 +37,39 @@ namespace McAuthz
             this.rules = rules;
         }
 
-        internal (bool, string) IsAuthorized(AuthorizationHandlerContext context) {
+        public (bool, string) IsAuthorized(AuthorizationHandlerContext context) {
             var principal = context.User;
 
-            dynamic path = "*";
-            dynamic action = "GET";
+            string path = "*";
+            string action = "GET";
 
-            bool isResponse = false;
-
-            // Get controller from route data in context. The netstandard2.0 version
-            // of DefaultHttpContext.Request doesn't have the RouteValues property
-            // so we get it by reflection.
-            // TODO refactor this into a more robust method with progressive fallback.
-            IDictionary<string, object> route = new Dictionary<string, object>();
-            if (context.Resource is DefaultHttpContext dhc) {
-                isResponse = dhc.Response.HasStarted;
+            if (context.Resource is HttpContext hc)
+            {
+                path = hc.Request.Path;
+                action = hc.Request.Method;
+            }
+            else if (context.Resource is DefaultHttpContext dhc) {
+                // Get controller from route data in context. The netstandard2.0 version
+                // of DefaultHttpContext.Request doesn't have the RouteValues property
+                // so we get it by reflection.
+                IDictionary<string, object> route = new Dictionary<string, object>();
                 Type dhcType = dhc.Request.GetType();
                 var routeData = dhcType.GetProperties().FirstOrDefault(x => x.Name == "RouteValues");
                 if (routeData != null) {
                     route = (IDictionary<string, object>)routeData.GetValue(dhc.Request);
+                    if (route.TryGetValue("controller", out object rPath)) {
+                        path = rPath.ToString();
+                    };
+                    if (route.TryGetValue("action", out object rAction))
+                    {
+                        action = rAction.ToString();
+                    }
                 }
             }
-
-            route.TryGetValue("controller", out path);
-            route.TryGetValue("action", out action);
+            else {
+                return (false,
+                    "Authorization rules cannot be applied to a context without a (DefaultHttpContext)Resource");
+            }
 
             // Inspect the context using provided policy rules
             IEnumerable<RulePolicy> effectivePolicies = rules.Policies(path, action);
@@ -78,6 +87,7 @@ namespace McAuthz
                     rules.Any(r => {
                         var evaluation = r.EvaluatePrincipal(id);
                         if (evaluation.Succes) logger?.LogInformation($"Identity {id.Name} passed evaluation of policy: '{r.Name}'. {action} {path}");
+                        else logger?.LogDebug($"Identity {id.Name} failed evaluation of policy: '{r.Name}'. {action} {path}");
 
                         return evaluation.Succes;
                     }))
