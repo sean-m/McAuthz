@@ -42,8 +42,15 @@ namespace McAuthz.Tests.Plumbing {
             return results;
         }
 
-        public IEnumerable<RulePolicy> Policies(string route, string action) {
-            throw new NotImplementedException();
+
+        public IEnumerable<RulePolicy> Policies(string route, string method = "GET")
+        {
+            return PolicyCollection.Where(x => route.Like(x.Route)
+                                               && method.Like(x.Action));
+        }
+
+        public void SetPolicies(IEnumerable<RulePolicy> policies) {
+            PolicyCollection = policies;
         }
     }
 }
