@@ -125,7 +125,7 @@ namespace McAuthz
         }
 
 
-        internal (bool, string) IsAuthorized(AuthorizationHandlerContext context, object model) {
+        public (bool, string) IsAuthorized(AuthorizationHandlerContext context, object model) {
             (bool, string) modelAuthorized = (false, string.Empty);
 
             // Resolve data type
