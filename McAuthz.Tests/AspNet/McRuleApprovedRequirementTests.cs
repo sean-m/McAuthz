@@ -398,16 +398,12 @@ namespace McAuthz.Tests.AspNet
 
             var policies = new List<RulePolicy>
             {
-                new ResourceRulePolicy<NPC>()
+                new ResourceRulePolicy<NPC>([("Name", "TestModel")])
                 {
                     Name = "Model Policy",
                     Route = "/TestController",
                     Action = "GET",
                     Authentication = AuthenticationStatus.Authenticated,
-                    Requirements = new List<Requirement>
-                    {
-                        new PropertyRequirement("Name", "TestModel")
-                    }
                 }
             };
 
