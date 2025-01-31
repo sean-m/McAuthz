@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>McAuthorization</Title>
-	<PackageVersion>0.2.1</PackageVersion>
+	<PackageVersion>0.3.0</PackageVersion>
     <PackageProjectUrl>https://github.com/sean-m/McAuthz</PackageProjectUrl>
     <Copyright>Sean McArdle 2025</Copyright>
     <RepositoryUrl>https://github.com/sean-m/McAuthz</RepositoryUrl>
